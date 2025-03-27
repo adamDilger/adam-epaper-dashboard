@@ -2,6 +2,7 @@ package main
 
 import (
 	"epaper-dashboard/bom"
+	"epaper-dashboard/processing"
 	"fmt"
 	"image"
 	"image/color"
@@ -64,8 +65,8 @@ func main() {
 	}
 	dc.DrawImage(iconImage, 30, 30)
 
-	data := BuildDataArray(dc)
-	bytes := BuildByteArray(data)
+	data := processing.ConvertContextToBoolArray(dc)
+	bytes := processing.ConvertBoolArrayToBytes(data)
 
 	// MakeTestImage(data)
 	MakeTestImageBytes(bytes[:])
@@ -107,57 +108,10 @@ func loadFonts() fonts {
 	return f
 }
 
-func PrintTestImage(data [HEIGHT][WIDTH]bool) {
-	for y := 0; y < HEIGHT; y++ {
-		fmt.Print("|")
-
-		for x := 0; x < WIDTH; x++ {
-			if data[y][x] {
-				fmt.Print("X")
-			} else {
-				fmt.Print(" ")
-			}
-		}
-		fmt.Println("|")
-	}
-}
-
-func BuildDataArray(dc *gg.Context) [HEIGHT][WIDTH]bool {
-	data := [HEIGHT][WIDTH]bool{}
-	img := dc.Image()
-
-	for y := 0; y < HEIGHT; y++ {
-		for x := 0; x < WIDTH; x++ {
-			_, _, _, a := img.At(x, y).RGBA()
-			if a < 0x7777 {
-			} else {
-				data[y][x] = true
-			}
-		}
-	}
-
-	return data
-}
-
-func BuildByteArray(data [HEIGHT][WIDTH]bool) [WIDTH * HEIGHT / 8]byte {
-	bytes := [WIDTH * HEIGHT / 8]byte{}
-	for y := 0; y < HEIGHT; y++ {
-		for x := 0; x < WIDTH/8; x++ {
-			for i := 0; i < 8; i++ {
-				if data[y][x*8+i] {
-					bytes[y*(WIDTH/8)+x] |= 1 << (7 - i)
-				}
-			}
-		}
-	}
-
-	return bytes
-}
-
 func MakeTestImage(data [HEIGHT][WIDTH]bool) {
 	i := image.NewRGBA(image.Rect(0, 0, WIDTH, HEIGHT))
-	for y := 0; y < HEIGHT; y++ {
-		for x := 0; x < WIDTH; x++ {
+	for y := range HEIGHT {
+		for x := range WIDTH {
 			if data[y][x] {
 				i.Set(x, y, color.Black)
 			} else {
@@ -180,8 +134,8 @@ func MakeTestImage(data [HEIGHT][WIDTH]bool) {
 func MakeTestImageBytes(data []byte) {
 	i := image.NewRGBA(image.Rect(0, 0, WIDTH, HEIGHT))
 
-	for y := 0; y < HEIGHT; y++ {
-		for x := 0; x < WIDTH; x++ {
+	for y := range HEIGHT {
+		for x := range WIDTH {
 			pos := y*(WIDTH/8) + x/8
 			bit := x % 8
 
