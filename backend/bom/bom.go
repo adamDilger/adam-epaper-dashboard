@@ -21,6 +21,7 @@ type BomSummary struct {
 	CurrentTemp string
 	TodaysMax   string
 	Summary     string
+	IconName    string
 	Rain        []RainData
 }
 
@@ -90,10 +91,14 @@ func parseHtml(html string) (BomSummary, error) {
 
 	summary := doc.Find(".forecasts .forecast-summary dd.summary").First().Text()
 
+	iconHref := doc.Find(".forecasts .forecast-summary dd.image img").First().AttrOr("src", "")
+	iconName := iconHref[strings.LastIndex(iconHref, "/"):]
+
 	result := BomSummary{
 		CurrentTemp: currentTemp,
 		TodaysMax:   todaysMax,
 		Summary:     summary,
+		IconName:    iconName,
 		Rain:        []RainData{},
 	}
 

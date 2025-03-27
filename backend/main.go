@@ -28,6 +28,7 @@ func main() {
 	fmt.Printf("Current temp: %s\n", a.CurrentTemp)
 	fmt.Printf("Todays max: %s\n", a.TodaysMax)
 	fmt.Printf("Summary: %s\n", a.Summary)
+	fmt.Printf("IconName: %s\n", a.IconName)
 
 	fonts := loadFonts()
 
@@ -55,6 +56,13 @@ func main() {
 
 	dc.SetFontFace(fonts.helvetica.small)
 	dc.DrawStringAnchored(a.Summary, 750, 400, 1, 0.5)
+
+	// load image from file
+	iconImage, err := gg.LoadImage(fmt.Sprintf("./images/%s", a.IconName))
+	if err != nil {
+		panic(err)
+	}
+	dc.DrawImage(iconImage, 30, 30)
 
 	data := BuildDataArray(dc)
 	bytes := BuildByteArray(data)
