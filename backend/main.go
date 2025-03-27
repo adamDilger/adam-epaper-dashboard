@@ -26,6 +26,7 @@ func main() {
 		panic(err)
 	}
 
+	fmt.Printf("LocationName : %s\n", a.LocationName)
 	fmt.Printf("Current temp: %s\n", a.CurrentTemp)
 	fmt.Printf("Todays max: %s\n", a.TodaysMax)
 	fmt.Printf("Summary: %s\n", a.Summary)
@@ -50,13 +51,20 @@ func main() {
 	dc.SetColor(color.Black)
 
 	dc.SetFontFace(fonts.helvetica.medium)
-	dc.DrawStringAnchored("Stones Corner", 30, 400, 0, 0.5)
+	dc.DrawStringAnchored(a.LocationName, 30, 400, 0, 0.5)
 
 	dc.SetFontFace(fonts.helvetica.extralarge)
 	dc.DrawStringAnchored(a.CurrentTemp, 750, HEIGHT/2, 1, 0.5)
 
 	dc.SetFontFace(fonts.helvetica.small)
 	dc.DrawStringAnchored(a.Summary, 750, 400, 1, 0.5)
+
+	dc.SetFontFace(fonts.helvetica.extrasmall)
+	w, _ := dc.MeasureString("Max")
+	dc.DrawStringAnchored("Max", 750, 50, 1, 0)
+
+	dc.SetFontFace(fonts.helvetica.small)
+	dc.DrawStringAnchored(a.TodaysMax, 745-w, 50, 1, 0)
 
 	// load image from file
 	iconImage, err := gg.LoadImage(fmt.Sprintf("./images/%s", a.IconName))
@@ -66,17 +74,22 @@ func main() {
 	dc.DrawImage(iconImage, 30, 30)
 
 	data := processing.ConvertContextToBoolArray(dc)
-	bytes := processing.ConvertBoolArrayToBytes(data)
-
 	// MakeTestImage(data)
-	MakeTestImageBytes(bytes[:])
+
+	// bytes := processing.ConvertBoolArrayToBytes(data)
+	// fmt.Printf("size of bytes: %d\n", len(bytes))
+	// MakeTestImageBytes(bytes)
+
+	bytesRLE := processing.ConvertBoolArrayToBytesRLE(data)
+	fmt.Printf("size of bytes RLE: %d\n", len(bytesRLE))
+	MakeTestImageBytesRLE(bytesRLE)
 
 	// make a new http server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Serving image")
 		w.Header().Set("Content-Type", "application/octet-stream")
-		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(bytes)))
-		w.Write(bytes[:])
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(bytesRLE)))
+		w.Write(bytesRLE)
 	})
 	fmt.Println("Listening on :8000")
 	log.Fatal(http.ListenAndServe(":8000", nil))
@@ -148,6 +161,42 @@ func MakeTestImageBytes(data []byte) {
 	}
 
 	o, err := os.Create("out_bytes.png")
+	if err != nil {
+		panic(err)
+	}
+
+	err = png.Encode(o, i)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func MakeTestImageBytesRLE(data []uint8) {
+	i := image.NewRGBA(image.Rect(0, 0, WIDTH, HEIGHT))
+
+	y := 0
+	x := 0
+	for _, b := range data {
+		isBlack := b&0b10000000 != 0
+		count := b & 0b01111111
+
+		for range count {
+			if isBlack {
+				i.Set(x, y, color.Black)
+			} else {
+				i.Set(x, y, color.White)
+			}
+
+			x++
+		}
+
+		if x >= WIDTH {
+			x = 0
+			y++
+		}
+	}
+
+	o, err := os.Create("out_bytes_rle.png")
 	if err != nil {
 		panic(err)
 	}

@@ -1,6 +1,10 @@
 package processing
 
-import "github.com/fogleman/gg"
+import (
+	"fmt"
+
+	"github.com/fogleman/gg"
+)
 
 func ConvertContextToBoolArray(dc *gg.Context) [][]bool {
 	img := dc.Image()
@@ -39,6 +43,62 @@ func ConvertBoolArrayToBytes(data [][]bool) []byte {
 					bytes[y*(WIDTH/8)+x] |= 1 << (7 - i)
 				}
 			}
+		}
+	}
+
+	return bytes
+}
+
+func ConvertBoolArrayToBytesRLE(data [][]bool) []uint8 {
+	HEIGHT := len(data)
+	WIDTH := len(data[0])
+
+	// 8  -- colour of pixel
+	// 7  -- count
+	// 6  -- count
+	// 5  -- count
+	// 4  -- count
+	// 3  -- count
+	// 2  -- count
+	// 1  -- count
+
+	fmt.Println(HEIGHT)
+	fmt.Println(WIDTH)
+
+	bytes := []uint8{}
+
+	for y := range HEIGHT {
+		isBlack := false
+		var count uint8 = 1
+		x := 0
+
+		for {
+			if x >= WIDTH {
+				break
+			}
+
+			isBlack = data[y][x]
+
+			peek := x + 1
+			for peek < WIDTH && count < 127 {
+				if data[y][peek] != isBlack {
+					break
+				}
+				peek++
+				count++
+			}
+
+			x = peek
+
+			var value uint8 = 0
+			if isBlack {
+				value = 128
+			}
+
+			value |= count
+			bytes = append(bytes, value)
+
+			count = 1
 		}
 	}
 

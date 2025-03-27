@@ -18,11 +18,12 @@ type RainData struct {
 }
 
 type BomSummary struct {
-	CurrentTemp string
-	TodaysMax   string
-	Summary     string
-	IconName    string
-	Rain        []RainData
+	LocationName string
+	CurrentTemp  string
+	TodaysMax    string
+	Summary      string
+	IconName     string
+	Rain         []RainData
 }
 
 func getBomSummaryHtml() (string, error) {
@@ -86,6 +87,9 @@ func parseHtml(html string) (BomSummary, error) {
 		return BomSummary{}, errors.New("failed to parse HTML")
 	}
 
+	locationName := doc.Find("h1").First().Text()
+	locationName = locationName[0:strings.Index(locationName, "Weather")]
+
 	currentTemp := toSafeTemp(doc.Find("li.airT").First().Text())
 	todaysMax := toSafeTemp(doc.Find("dd.max").First().Text())
 
@@ -95,11 +99,12 @@ func parseHtml(html string) (BomSummary, error) {
 	iconName := iconHref[strings.LastIndex(iconHref, "/"):]
 
 	result := BomSummary{
-		CurrentTemp: currentTemp,
-		TodaysMax:   todaysMax,
-		Summary:     summary,
-		IconName:    iconName,
-		Rain:        []RainData{},
+		LocationName: locationName,
+		CurrentTemp:  currentTemp,
+		TodaysMax:    todaysMax,
+		Summary:      summary,
+		IconName:     iconName,
+		Rain:         []RainData{},
 	}
 
 	doc.Find(".pme table tbody tr").EachWithBreak(func(i int, s *goquery.Selection) bool {

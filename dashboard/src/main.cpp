@@ -14,8 +14,6 @@ int status = WL_IDLE_STATUS;
 char url[] = "192.168.0.147";
 const char endOfHeaders[] = "\r\n\r\n";
 
-const int RESPONSE_SIZE = 48000;
-
 void connectToWifi();
 void screenMessage(const char *text);
 int doRequest(const char *url);
@@ -29,15 +27,17 @@ void setup()
 
   display.fillScreen(GxEPD_WHITE);
   display.display(true);
-
-  doRequest(url);
-
-  display.display(false);
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
+  while (true)
+  {
+    display.fillScreen(GxEPD_WHITE);
+    doRequest(url);
+    display.display(true);
+    delay(8000);
+  }
 }
 
 void connectToWifi()
@@ -121,6 +121,23 @@ int doRequest(const char *url)
     return 1;
   }
 
+  if (!client.find("Content-Length: "))
+  {
+    Serial.println("Invalid response, no content length");
+    client.stop();
+    delay(10000);
+    return 0;
+  }
+
+  int contentLength = client.parseInt();
+  if (contentLength <= 0 || contentLength > 48000)
+  {
+    Serial.println("Invalid response, content length is 0 or too large");
+    client.stop();
+    delay(10000);
+    return 0;
+  }
+
   // Skip HTTP headers
   if (!client.find(endOfHeaders))
   {
@@ -130,26 +147,47 @@ int doRequest(const char *url)
     return 0;
   }
 
-  Serial.printf("drawing bitmap\n");
+  Serial.printf("drawing bitmap with content length of %d\n", contentLength);
 
-  int w_byte_count = display.width() / 8;
-  uint8_t *response = (uint8_t *)malloc(w_byte_count);
+  int bufferSize = 128;
+  uint8_t *response = (uint8_t *)malloc(bufferSize);
 
-  // read each row of the response one by one, and draw it on the screen
-  for (int y = 0; y < display.height(); y++)
+  int y = 0;
+  int x = 0;
+  uint8_t count = 0;
+  bool isBlack = false;
+
+  while (true)
   {
-    client.read(response, w_byte_count);
-
-    // for each byte in the row
-    for (int pos = 0; pos < w_byte_count; pos++)
+    int av = client.available();
+    if (av == 0)
     {
-      // loop over each bit, drawing a pixel if it's set
-      for (int i = 0; i < 8; i++)
+      break;
+    }
+
+    if (av < bufferSize)
+    {
+      bufferSize = av;
+    }
+
+    client.read(response, bufferSize);
+
+    for (int pos = 0; pos < bufferSize; pos++)
+    {
+      isBlack = (response[pos] & 0b10000000) != 0;
+      count = response[pos] & 0b01111111;
+
+      if (isBlack)
       {
-        if ((response[pos] & (1 << i)) != 0)
-        {
-          display.drawPixel((pos * 8) + (7 - i), y, GxEPD_BLACK);
-        }
+        display.drawLine(x, y, x + count, y, GxEPD_BLACK);
+      }
+
+      x += count;
+
+      if (x >= display.width())
+      {
+        x = 0;
+        y++;
       }
     }
   }
