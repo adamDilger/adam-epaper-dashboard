@@ -6,6 +6,8 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"log"
+	"net/http"
 	"os"
 
 	"github.com/fogleman/gg"
@@ -57,8 +59,18 @@ func main() {
 	data := BuildDataArray(dc)
 	bytes := BuildByteArray(data)
 
-	MakeTestImage(data)
+	// MakeTestImage(data)
 	MakeTestImageBytes(bytes[:])
+
+	// make a new http server
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Serving image")
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(bytes)))
+		w.Write(bytes[:])
+	})
+	fmt.Println("Listening on :8000")
+	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 
 type fonts struct {
