@@ -28,7 +28,7 @@ type BomSummary struct {
 }
 
 func getBomSummaryHtml() (string, error) {
-	url := "http://www.bom.gov.au/places/tas/montrose"
+	url := "http://www.bom.gov.au/places/qld/greenslopes"
 
 	resp, err := http.NewRequest(http.MethodGet, url, nil)
 	resp.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")

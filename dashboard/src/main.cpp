@@ -9,35 +9,52 @@
 #include "graphics/GxEPD2_display_selection_new_style.h"
 #include "wifi_creds.h"
 
+const char url[] = "192.168.0.147";
+const char endOfHeaders[] = "\r\n\r\n";
+
 WiFiClient client;
 int status = WL_IDLE_STATUS;
-char url[] = "192.168.0.147";
-const char endOfHeaders[] = "\r\n\r\n";
+
+struct ResponseMetadata
+{
+  uint8_t formatVersion;
+  uint8_t durationMinutes;
+};
 
 void connectToWifi();
 void screenMessage(const char *text);
-int doRequest(const char *url);
+int doRequest(const char *url, ResponseMetadata *responseMetadata);
 
 void setup()
 {
   Serial.begin(115200);
   display.init(115200, true, 2, false); // USE THIS for Waveshare boards with "clever" reset circuit, 2ms reset pulse
-  screenMessage("Hello World!");
   connectToWifi();
 
   display.fillScreen(GxEPD_WHITE);
   display.display(true);
 }
 
+int refreshCount = 0;
+
 void loop()
 {
-  while (true)
+  ResponseMetadata responseMetadata;
+
+  display.fillScreen(GxEPD_WHITE);
+  doRequest(url, &responseMetadata);
+
+  if (refreshCount > 10)
   {
-    display.fillScreen(GxEPD_WHITE);
-    doRequest(url);
-    display.display(true);
-    delay(8000);
+    display.display(false);
+    refreshCount = 0;
   }
+  else
+  {
+    display.display(true);
+  }
+
+  delay(responseMetadata.durationMinutes * 60 * 1000);
 }
 
 void connectToWifi()
@@ -87,7 +104,7 @@ void screenMessage(const char *text)
   display.display(true);
 }
 
-int doRequest(const char *url)
+int doRequest(const char *url, ResponseMetadata *responseMetadata)
 {
   if (!client.connect(url, 8000))
   {
@@ -148,6 +165,12 @@ int doRequest(const char *url)
   }
 
   Serial.printf("drawing bitmap with content length of %d\n", contentLength);
+
+  client.read(&responseMetadata->formatVersion, 1);
+  client.read(&responseMetadata->durationMinutes, 1);
+
+  Serial.printf("format version: %d\n", responseMetadata->formatVersion);
+  Serial.printf("duration minutes: %d\n", responseMetadata->durationMinutes);
 
   int bufferSize = 128;
   uint8_t *response = (uint8_t *)malloc(bufferSize);

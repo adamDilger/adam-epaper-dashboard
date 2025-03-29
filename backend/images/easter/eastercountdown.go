@@ -2,7 +2,6 @@ package eastercountdown
 
 import (
 	"embed"
-	"fmt"
 	"image"
 	"image/color"
 	"strconv"
@@ -51,8 +50,7 @@ func EasterCountdownImage(WIDTH, HEIGHT int, now time.Time) image.Image {
 	if err != nil {
 		panic(err)
 	}
-	iconImage, s, err := image.Decode(bunnyImageFile)
-	fmt.Println(s)
+	iconImage, _, err := image.Decode(bunnyImageFile)
 	dc.DrawImage(iconImage, 800-480, 0)
 
 	return dc.Image()
