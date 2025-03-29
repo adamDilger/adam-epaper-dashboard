@@ -1,14 +1,10 @@
 package processing
 
 import (
-	"fmt"
-
-	"github.com/fogleman/gg"
+	"image"
 )
 
-func ConvertContextToBoolArray(dc *gg.Context) [][]bool {
-	img := dc.Image()
-
+func ConvertContextToBoolArray(img image.Image) [][]bool {
 	height := img.Bounds().Max.Y
 	width := img.Bounds().Max.X
 
@@ -61,9 +57,6 @@ func ConvertBoolArrayToBytesRLE(data [][]bool) []uint8 {
 	// 3  -- count
 	// 2  -- count
 	// 1  -- count
-
-	fmt.Println(HEIGHT)
-	fmt.Println(WIDTH)
 
 	bytes := []uint8{}
 
