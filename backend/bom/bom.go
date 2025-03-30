@@ -4,9 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -73,13 +76,40 @@ func GetBomSummaryTest(path string) (BomSummary, error) {
 	return parseHtml(string(bytes))
 }
 
+var lock = sync.Mutex{}
+var lastFetchTime time.Time
+var lastBomSummary BomSummary
+
+const fetchInterval = 10 * time.Minute
+
 func GetBomSummary() (BomSummary, error) {
-	html, err := getBomSummaryHtml()
-	if err != nil {
-		return BomSummary{}, fmt.Errorf("failed to request BOM data: %v", err)
+	if time.Since(lastFetchTime) < fetchInterval {
+		log.Printf("Using cached BOM data, since: %v \n", time.Since(lastFetchTime))
+		return lastBomSummary, nil
 	}
 
-	return parseHtml(html)
+	lock.Lock()
+	defer lock.Unlock()
+
+	lastFetchTime = time.Now()
+
+	html, err := getBomSummaryHtml()
+	if err != nil {
+		lastBomSummary = BomSummary{}
+		err = fmt.Errorf("failed to request BOM data: %v", err)
+		log.Println(err)
+		return lastBomSummary, err
+	}
+
+	lastBomSummary, err = parseHtml(html)
+	if err != nil {
+		lastBomSummary = BomSummary{}
+		err = fmt.Errorf("failed to parse BOM data: %v", err)
+		log.Println(err)
+		return lastBomSummary, err
+	}
+
+	return lastBomSummary, nil
 }
 
 func parseHtml(html string) (BomSummary, error) {

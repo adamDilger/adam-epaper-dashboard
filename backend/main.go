@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -45,8 +46,13 @@ func main() {
 		w.Write(response)
 	})
 
-	fmt.Println("Listening on :8000")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	port := "8000"
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		port = envPort
+	}
+
+	log.Println("Listening on :" + port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 type Image struct {
