@@ -6,6 +6,8 @@ import (
 	eastercountdown "epaper-dashboard/images/easter"
 	"epaper-dashboard/processing"
 	"fmt"
+	"image"
+	"image/png"
 	"log"
 	"net/http"
 	"os"
@@ -22,6 +24,34 @@ func main() {
 
 	// make a new http server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Accept") != "application/octet-stream" {
+			// coming from the browser
+			// send back the image
+
+			var m image.Image
+			if imageIndex == 0 {
+				a, err := bom.GetBomSummary()
+				if err != nil {
+					log.Println("Error getting BOM summary:", err)
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+
+				m = bomsummary.BomSummaryImage(WIDTH, HEIGHT, a)
+			} else {
+				m = eastercountdown.EasterCountdownImage(WIDTH, HEIGHT, time.Now())
+			}
+
+			w.Header().Set("Content-Type", "image/png")
+			err := png.Encode(w, m)
+			if err != nil {
+				log.Println("Error encoding image:", err)
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+
+			return
+		}
+
 		log.Println("Serving image")
 
 		var image Image
@@ -40,7 +70,6 @@ func main() {
 		}
 
 		response := append(headers, image.data...)
-
 		w.Header().Set("Content-Type", "application/octet-stream")
 		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(response)))
 		w.Write(response)

@@ -9,7 +9,7 @@
 #include "graphics/GxEPD2_display_selection_new_style.h"
 #include "wifi_creds.h"
 
-const char url[] = "192.168.0.147";
+const char url[] = "dashboard.dlgr.au";
 const char endOfHeaders[] = "\r\n\r\n";
 
 WiFiClient client;
@@ -106,7 +106,7 @@ void screenMessage(const char *text)
 
 int doRequest(const char *url, ResponseMetadata *responseMetadata)
 {
-  if (!client.connect(url, 8000))
+  if (!client.connect(url, 80))
   {
     Serial.println("Connection failed");
     delay(10000);
@@ -115,7 +115,8 @@ int doRequest(const char *url, ResponseMetadata *responseMetadata)
 
   // Send HTTP request
   client.println("GET / HTTP/1.1");
-  client.println("Host: 192.168.0.147");
+  client.printf("Host: %s\n", url);
+  client.println("Accept: application/octet-stream");
 
   if (client.println() == 0)
   {
