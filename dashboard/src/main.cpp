@@ -52,6 +52,7 @@ void loop()
   else
   {
     display.display(true);
+    refreshCount++;
   }
 
   delay(responseMetadata.durationMinutes * 60 * 1000);
@@ -181,44 +182,54 @@ int doRequest(const char *url, ResponseMetadata *responseMetadata)
   uint8_t count = 0;
   bool isBlack = false;
 
-  while (true)
+  while (client.available() > 0)
   {
-    int av = client.available();
-    if (av == 0)
+    while (true)
     {
-      break;
-    }
-
-    if (av < bufferSize)
-    {
-      bufferSize = av;
-    }
-
-    client.read(response, bufferSize);
-
-    for (int pos = 0; pos < bufferSize; pos++)
-    {
-      isBlack = (response[pos] & 0b10000000) != 0;
-      count = response[pos] & 0b01111111;
-
-      if (isBlack)
+      int av = client.available();
+      if (av == 0)
       {
-        display.drawLine(x, y, x + count, y, GxEPD_BLACK);
+        break;
       }
 
-      x += count;
-
-      if (x >= display.width())
+      if (av < bufferSize)
       {
-        x = 0;
-        y++;
+        bufferSize = av;
+      }
+
+      client.read(response, bufferSize);
+
+      for (int pos = 0; pos < bufferSize; pos++)
+      {
+        isBlack = (response[pos] & 0b10000000) != 0;
+        count = response[pos] & 0b01111111;
+
+        if (isBlack)
+        {
+          display.drawLine(x, y, x + count, y, GxEPD_BLACK);
+        }
+
+        x += count;
+
+        if (x >= display.width())
+        {
+          x = 0;
+          y++;
+        }
       }
     }
+
+    // TODO: this is a bit rubbish, wait 800ms between each read chunk
+    // to allow for more data to be available, then start reading again
+    // if we are still waiting for data
+    delay(800);
   }
 
   Serial.printf("fin\n");
 
   client.stop();
+
+  free(response);
 
   return 0;
 }
