@@ -58,7 +58,11 @@ func main() {
 
 		if imageIndex == 0 {
 			image = weatherSummary()
-			imageIndex = 1
+
+			// hax, just stop easter widget from showing up post easter
+			if isBeforeEaster() {
+				imageIndex = 1
+			}
 		} else {
 			image = easterCountdown()
 			imageIndex = 0
@@ -99,8 +103,15 @@ func weatherSummary() Image {
 	data := processing.ConvertContextToBoolArray(image)
 	bytesRLE := processing.ConvertBoolArrayToBytesRLE(data)
 
+	// simple hax to reduce the amount of night refreshes
+	// TODO: calculate a better duration to ensure the screen always "wakes up" at say 5am
+	var duration uint8 = 5
+	if time.Now().Hour() >= 0 && time.Now().Hour() < 4 {
+		duration = 60
+	}
+
 	return Image{
-		durationMinutes: 5,
+		durationMinutes: duration,
 		data:            bytesRLE,
 	}
 }
@@ -114,4 +125,14 @@ func easterCountdown() Image {
 		durationMinutes: 2,
 		data:            bytesRLE,
 	}
+}
+
+func isBeforeEaster() bool {
+	loc, err := time.LoadLocation("Australia/Brisbane")
+	if err != nil {
+		panic(err)
+	}
+	easterDate := time.Date(2025, 4, 21, 0, 0, 0, 0, loc)
+
+	return time.Now().Before(easterDate)
 }

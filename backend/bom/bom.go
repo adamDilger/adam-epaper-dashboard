@@ -15,9 +15,10 @@ import (
 )
 
 type RainData struct {
-	Time     string
-	Rainfall string
-	Chance   string
+	HourStart        int
+	HourEnd          int
+	RainfallMills    int
+	ChancePercentage int
 }
 
 type BomSummary struct {
@@ -141,28 +142,71 @@ func parseHtml(html string) (BomSummary, error) {
 		Rain:         []RainData{},
 	}
 
-	doc.Find(".pme table tbody tr").EachWithBreak(func(i int, s *goquery.Selection) bool {
-		if i == 0 {
-			return true // Skip the first row
-		}
+	/*
+		doc.Find(".pme table tbody tr").EachWithBreak(func(i int, s *goquery.Selection) bool {
+			if i == 0 {
+				return true // Skip the first row
+			}
 
-		time := strings.TrimSpace(s.Find(".time").Text())
-		time = strings.ReplaceAll(strings.ReplaceAll(time, " :00", ""), " (.m)", "$1")
-		rainfall := strings.TrimSpace(strings.ReplaceAll(s.Find(".amt").Text(), " ", ""))
-		chance := strings.TrimSpace(s.Find(".coaf").Text())
+			time := s.Find("td.time").Text()
+			// regex for this string: 7:00 am - 10:00 am
+			rg := regexp.MustCompile(`(\d+):\d+\s([ap]m)\s-\s(\d+):\d+\s([ap]m)`)
+			matches := rg.FindStringSubmatch(time)
 
-		if time == "" || rainfall == "" || chance == "" {
+			rd := RainData{}
+
+			fmt.Printf("matches: %v\n", matches)
+			if v, err := strconv.Atoi(matches[1]); err != nil {
+				log.Printf("failed to parse hour start: %v", err)
+			} else {
+				rd.HourStart = v
+			}
+
+			if matches[2] == "pm" {
+				rd.HourStart += 12
+			}
+
+			if v, err := strconv.Atoi(matches[3]); err != nil {
+				log.Printf("failed to parse hour end: %v", err)
+			} else {
+				rd.HourEnd = v
+			}
+
+			if matches[4] == "pm" {
+				rd.HourEnd += 12
+			}
+
+			rainfallString := s.Find(".amt").Text()
+			if strings.Contains(rainfallString, " - ") {
+				rainfallString = strings.TrimSpace(strings.Split(rainfallString, " - ")[0])
+				rainfallString = strings.ReplaceAll(rainfallString, " mm", "")
+				if v, err := strconv.Atoi(rainfallString); err != nil {
+					log.Printf("failed to parse rainfall: %v", err)
+				} else {
+					rd.RainfallMills = v
+				}
+			} else {
+				rainfallString = strings.ReplaceAll(rainfallString, " mm", "")
+				if v, err := strconv.Atoi(rainfallString); err != nil {
+					log.Printf("failed to parse rainfall: %v", err)
+				} else {
+					rd.RainfallMills = v
+				}
+			}
+
+			chance := s.Find(".coaf").Text()
+			chance = strings.TrimSpace(strings.ReplaceAll(chance, "%", ""))
+			if v, err := strconv.Atoi(chance); err != nil {
+				log.Printf("failed to parse chance: %v", err)
+				return true
+			} else {
+				rd.ChancePercentage = v
+			}
+
+			result.Rain = append(result.Rain, rd)
 			return true
-		}
-
-		result.Rain = append(result.Rain, RainData{
-			Time:     time,
-			Rainfall: rainfall,
-			Chance:   chance,
 		})
-
-		return true
-	})
+	*/
 
 	return result, nil
 }

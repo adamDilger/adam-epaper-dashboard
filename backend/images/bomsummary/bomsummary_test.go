@@ -23,6 +23,7 @@ func TestBomSummaryImage(t *testing.T) {
 	image := bomsummary.BomSummaryImage(800, 480, a)
 	data := processing.ConvertContextToBoolArray(image)
 	writeImage(data)
+	// t.FailNow()
 }
 
 func writeImage(data [][]bool) {

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"sync"
+	"time"
 
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/truetype"
@@ -19,35 +21,35 @@ var helvetica embed.FS
 var icons embed.FS
 
 func BomSummaryImage(WIDTH, HEIGHT int, a bom.BomSummary) image.Image {
-	fonts := loadFonts()
+	fonts := sync.OnceValue(loadFonts)()
 
 	im := image.NewRGBA(image.Rect(0, 0, WIDTH, HEIGHT))
 	dc := gg.NewContextForImage(im)
 
 	dc.SetColor(color.Black)
 
-	dc.SetFontFace(fonts.helvetica.medium)
-	dc.DrawStringAnchored(a.LocationName, 30, 400, 0, 0.5)
+	dc.SetFontFace(fonts.helvetica.small)
+	dc.DrawStringAnchored(a.LocationName, 30, 420, 0, 0.5)
 
 	dc.SetFontFace(fonts.helvetica.extralarge)
 	dc.DrawStringAnchored(a.CurrentTemp, 750, float64(HEIGHT)/2, 1, 0.5)
 
-	dc.SetFontFace(fonts.helvetica.small)
+	dc.SetFontFace(fonts.helvetica.large)
 	dc.DrawStringAnchored(a.Summary, 750, 400, 1, 0.5)
 
-	dc.SetFontFace(fonts.helvetica.small)
+	dc.SetFontFace(fonts.helvetica.medium)
 	w, _ := dc.MeasureString(a.TodaysMax)
-	dc.DrawStringAnchored(a.TodaysMax, 750, 50, 1, 0)
+	dc.DrawStringAnchored(a.TodaysMax, 750, 70, 1, 0)
 
 	dc.SetFontFace(fonts.helvetica.extrasmall)
-	dc.DrawStringAnchored("Max", 740-w, 50, 1, 0)
+	dc.DrawStringAnchored("Max", 740-w, 70, 1, 0)
 
-	dc.SetFontFace(fonts.helvetica.small)
+	dc.SetFontFace(fonts.helvetica.medium)
 	w, _ = dc.MeasureString(a.Humidity)
-	dc.DrawStringAnchored(a.Humidity, 750, 80, 1, 0)
+	dc.DrawStringAnchored(a.Humidity, 750, 120, 1, 0)
 
 	dc.SetFontFace(fonts.helvetica.extrasmall)
-	dc.DrawStringAnchored("Humidity", 740-w, 80, 1, 0)
+	dc.DrawStringAnchored("Humidity", 740-w, 120, 1, 0)
 
 	iconImageFile, err := icons.Open(fmt.Sprintf("icons/%s", a.IconName))
 	if err != nil {
@@ -56,12 +58,34 @@ func BomSummaryImage(WIDTH, HEIGHT int, a bom.BomSummary) image.Image {
 	iconImage, _, err := image.Decode(iconImageFile)
 	dc.DrawImage(iconImage, 10, 10)
 
+	nowString := time.Now().Format("3:04pm 2/1/06")
+	dc.SetFontFace(fonts.helvetica.extraextrasmall)
+	dc.DrawStringAnchored(nowString, 800, 480, 1, 0)
+
+	// dc.SetRGB(1, 1, 1)
+	// dc.SetLineWidth(2)
+	// dc.SetFontFace(fonts.helvetica.extrasmall)
+	//
+	// dc.DrawLine(350, 100, float64(350+(len(a.Rain)*30)), 100)
+	// dc.Stroke()
+	// dc.DrawLine(350, 50, float64(350+(len(a.Rain)*30)), 50)
+	// dc.Stroke()
+	//
+	// for i, rain := range a.Rain {
+	// 	x := float64(i*30) + 350
+	// 	dc.DrawLine(x, 100, x, float64(100-(rain.ChancePercentage/2)))
+	// 	dc.Stroke()
+	//
+	// 	dc.DrawStringAnchored(fmt.Sprintf("%d", rain.RainfallMills), x, float64(90-(rain.RainfallMills*10)), 0.5, 0)
+	// 	dc.DrawStringAnchored(fmt.Sprintf("%d", rain.HourStart), x, 100, 0.5, 1)
+	// }
+
 	return dc.Image()
 }
 
 type fonts struct {
 	helvetica struct {
-		extrasmall, small, medium, large, extralarge font.Face
+		extraextrasmall, extrasmall, small, medium, large, extralarge font.Face
 	}
 }
 
@@ -76,6 +100,7 @@ func loadFonts() fonts {
 		*dest = font
 	}
 
+	run(14, &f.helvetica.extraextrasmall)
 	run(18, &f.helvetica.extrasmall)
 	run(30, &f.helvetica.small)
 	run(40, &f.helvetica.medium)

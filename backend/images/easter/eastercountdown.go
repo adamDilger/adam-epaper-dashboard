@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/fogleman/gg"
@@ -19,7 +20,7 @@ var bunnyImage embed.FS
 var helvetica embed.FS
 
 func EasterCountdownImage(WIDTH, HEIGHT int, now time.Time) image.Image {
-	fonts := loadFonts()
+	fonts := sync.OnceValue(loadFonts)()
 
 	im := image.NewRGBA(image.Rect(0, 0, WIDTH, HEIGHT))
 	dc := gg.NewContextForImage(im)
