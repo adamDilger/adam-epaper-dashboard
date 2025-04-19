@@ -3,7 +3,6 @@ package main
 import (
 	"epaper-dashboard/bom"
 	"epaper-dashboard/images/bomsummary"
-	eastercountdown "epaper-dashboard/images/easter"
 	"epaper-dashboard/processing"
 	"fmt"
 	"image"
@@ -20,8 +19,6 @@ const (
 )
 
 func main() {
-	imageIndex := 0
-
 	// make a new http server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Accept") != "application/octet-stream" {
@@ -29,21 +26,17 @@ func main() {
 			// send back the image
 
 			var m image.Image
-			if imageIndex == 0 {
-				a, err := bom.GetBomSummary()
-				if err != nil {
-					log.Println("Error getting BOM summary:", err)
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-
-				m = bomsummary.BomSummaryImage(WIDTH, HEIGHT, a)
-			} else {
-				m = eastercountdown.EasterCountdownImage(WIDTH, HEIGHT, time.Now())
+			a, err := bom.GetBomSummary()
+			if err != nil {
+				log.Println("Error getting BOM summary:", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
 			}
 
+			m = bomsummary.BomSummaryImage(WIDTH, HEIGHT, a)
+
 			w.Header().Set("Content-Type", "image/png")
-			err := png.Encode(w, m)
+			err = png.Encode(w, m)
 			if err != nil {
 				log.Println("Error encoding image:", err)
 				w.WriteHeader(http.StatusInternalServerError)
@@ -56,17 +49,7 @@ func main() {
 
 		var image Image
 
-		if imageIndex == 0 {
-			image = weatherSummary()
-
-			// hax, just stop easter widget from showing up post easter
-			if isBeforeEaster() {
-				imageIndex = 1
-			}
-		} else {
-			image = easterCountdown()
-			imageIndex = 0
-		}
+		image = weatherSummary()
 
 		headers := []uint8{
 			1,                     // format version
@@ -116,6 +99,7 @@ func weatherSummary() Image {
 	}
 }
 
+/*
 func easterCountdown() Image {
 	image := eastercountdown.EasterCountdownImage(WIDTH, HEIGHT, time.Now())
 	data := processing.ConvertContextToBoolArray(image)
@@ -136,3 +120,4 @@ func isBeforeEaster() bool {
 
 	return time.Now().Before(easterDate)
 }
+*/
