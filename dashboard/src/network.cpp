@@ -108,7 +108,7 @@ int doRequest(
                 if (isBlack)
                 {
                     // display.drawLine(x, y, x + count, y, GxEPD_BLACK);
-                    drawLine(x, y, x + count);
+                    drawLine(x, y, count);
                 }
 
                 x += count;
