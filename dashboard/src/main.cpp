@@ -50,6 +50,7 @@ void loop()
   else
   {
     display.display(true);
+    display.powerOff();
     refreshCount++;
   }
 

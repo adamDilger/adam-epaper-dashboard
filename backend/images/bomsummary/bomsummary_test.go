@@ -15,7 +15,7 @@ func TestBomSummaryImage(t *testing.T) {
 	// not a real test, just writes the image to a file
 	// so we can see what it looks like
 
-	a, err := bom.GetBomSummaryTest("./test.html")
+	a, err := bom.GetBomSummaryTest("./")
 	if err != nil {
 		t.Fatalf("failed to get BOM summary: %v", err)
 	}

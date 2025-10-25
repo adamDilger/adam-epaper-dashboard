@@ -3,7 +3,6 @@ package bomsummary
 import (
 	"embed"
 	"epaper-dashboard/bom"
-	"fmt"
 	"image"
 	"image/color"
 	"sync"
@@ -51,12 +50,13 @@ func BomSummaryImage(WIDTH, HEIGHT int, a bom.BomSummary) image.Image {
 	dc.SetFontFace(fonts.helvetica.extrasmall)
 	dc.DrawStringAnchored("Humidity", 740-w, 120, 1, 0)
 
-	iconImageFile, err := icons.Open(fmt.Sprintf("icons/%s", a.IconName))
-	if err != nil {
-		panic(err)
-	}
-	iconImage, _, err := image.Decode(iconImageFile)
-	dc.DrawImage(iconImage, 10, 10)
+	// TODO:
+	// iconImageFile, err := icons.Open(fmt.Sprintf("icons/%s", a.IconName))
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// iconImage, _, err := image.Decode(iconImageFile)
+	// dc.DrawImage(iconImage, 10, 10)
 
 	nowString := time.Now().Format("3:04pm 2/1/06")
 	dc.SetFontFace(fonts.helvetica.extraextrasmall)

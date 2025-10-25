@@ -1,6 +1,7 @@
 package bom
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -10,8 +11,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 type RainData struct {
@@ -31,50 +30,71 @@ type BomSummary struct {
 	Rain         []RainData
 }
 
-func getBomSummaryHtml() (string, error) {
-	url := "http://www.bom.gov.au/places/qld/greenslopes"
+func getBomSummaryJson() (io.ReadCloser, io.ReadCloser, error) {
+	weatherUrl := "https://api.bom.gov.au/apikey/v1/observations/latest/40913/atm/surf_air?include_qc_results=false"
+	forecastUrl := "https://api.bom.gov.au/apikey/v1/forecasts/texts?aac=QLD_PW015&aac=QLD_FW015&aac=QLD_MW013&aac=QLD_FA001&aac=QLD_ME001&aac=QLD_PT001&timezone=Australia%2FBrisbane"
 
-	resp, err := http.NewRequest(http.MethodGet, url, nil)
+	resp, err := http.NewRequest(http.MethodGet, weatherUrl, nil)
 	resp.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
 
-	response, err := http.DefaultClient.Do(resp)
 	if err != nil {
-		return "", err
-	}
-	defer response.Body.Close()
-
-	doc, err := goquery.NewDocumentFromReader(response.Body)
-	if err != nil {
-		return "", err
+		return nil, nil, err
 	}
 
-	html, err := doc.Html()
+	weatherResponse, err := http.DefaultClient.Do(resp)
+
 	if err != nil {
-		return "", err
+		return nil, nil, err
 	}
 
-	return html, nil
+	forecastResp, err := http.NewRequest(http.MethodGet, forecastUrl, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	forecastResp.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
+
+	forecastResponse, err := http.DefaultClient.Do(forecastResp)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	println("Fetched BOM data")
+
+	return weatherResponse.Body, forecastResponse.Body, nil
 }
 
-func toSafeTemp(temp string) string {
-	if temp == "" {
+func toSafeTempFloat(temp float64) string {
+	if temp == 0 {
 		return "n/a"
 	}
-	return strings.ReplaceAll(temp, " °C", "°")
+
+	return fmt.Sprintf("%.1f", temp)
 }
 
 func GetBomSummaryTest(path string) (BomSummary, error) {
-	f, err := os.Open(path)
+	f, err := os.Open(path + "test_weather.json")
 	if err != nil {
 		return BomSummary{}, fmt.Errorf("failed to parse file: %v", err)
 	}
 
-	bytes, err := io.ReadAll(f)
+	ff, err := os.Open(path + "test_forecast.json")
+	if err != nil {
+		return BomSummary{}, fmt.Errorf("failed to parse forecast file: %v", err)
+	}
+
+	bytesWeather, err := io.ReadAll(f)
 	if err != nil {
 		return BomSummary{}, fmt.Errorf("failed to read file: %v", err)
 	}
 
-	return parseHtml(string(bytes))
+	bytesForecast, err := io.ReadAll(ff)
+	if err != nil {
+		return BomSummary{}, fmt.Errorf("failed to read forecast file: %v", err)
+	}
+
+	return parseJson(strings.NewReader(string(bytesWeather)), strings.NewReader(string(bytesForecast)))
 }
 
 var lock = sync.Mutex{}
@@ -94,7 +114,7 @@ func GetBomSummary() (BomSummary, error) {
 
 	lastFetchTime = time.Now()
 
-	html, err := getBomSummaryHtml()
+	weatherBody, forecastBody, err := getBomSummaryJson()
 	if err != nil {
 		lastBomSummary = BomSummary{}
 		err = fmt.Errorf("failed to request BOM data: %v", err)
@@ -102,7 +122,10 @@ func GetBomSummary() (BomSummary, error) {
 		return lastBomSummary, err
 	}
 
-	lastBomSummary, err = parseHtml(html)
+	defer weatherBody.Close()
+	defer forecastBody.Close()
+
+	lastBomSummary, err = parseJson(weatherBody, forecastBody)
 	if err != nil {
 		lastBomSummary = BomSummary{}
 		err = fmt.Errorf("failed to parse BOM data: %v", err)
@@ -113,24 +136,32 @@ func GetBomSummary() (BomSummary, error) {
 	return lastBomSummary, nil
 }
 
-func parseHtml(html string) (BomSummary, error) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
+func parseJson(weatherReader io.Reader, forecastReader io.Reader) (BomSummary, error) {
+	var weather WeatherResponse
+	var forecast ForecastResponse
+
+	err := json.NewDecoder(weatherReader).Decode(&weather)
 	if err != nil {
-		return BomSummary{}, errors.New("failed to parse HTML")
+		return BomSummary{}, errors.New("failed to parse weather json: %v" + err.Error())
 	}
 
-	locationName := doc.Find("h1").First().Text()
-	locationName = locationName[0:strings.Index(locationName, "Weather")]
+	err = json.NewDecoder(forecastReader).Decode(&forecast)
+	if err != nil {
+		return BomSummary{}, errors.New("failed to parse forecast json: %v" + err.Error())
+	}
 
-	currentTemp := toSafeTemp(doc.Find("li.airT").First().Text())
-	todaysMax := toSafeTemp(doc.Find("dd.max").First().Text())
+	locationName := "Greenslopes" // TODO: get from response
+	// locationName = locationName[0:strings.Index(locationName, "Weather")]
 
-	summary := doc.Find(".forecasts .forecast-summary dd.summary").First().Text()
+	currentTemp := toSafeTempFloat(weather.Observation.Temperature.DryBulb1MinCel)
+	todaysMax := toSafeTempFloat(weather.Observation.Temperature.DryBulbMaxCel)
 
-	iconHref := doc.Find(".forecasts .forecast-summary dd.image img").First().AttrOr("src", "")
-	iconName := iconHref[strings.LastIndex(iconHref, "/")+1:]
+	summary := forecast.Forecast.Daily[0].Atmospheric.SurfaceAir.Weather.PrecisText
 
-	humidity := doc.Find("#summary-1 td").First().Text()
+	// iconHref := "" // TODO: doc.Find(".forecasts .forecast-summary dd.image img").First().AttrOr("src", "")
+	iconName := "" // TODO: iconHref[strings.LastIndex(iconHref, "/")+1:]
+
+	humidity := fmt.Sprintf("%1.f%%", weather.Observation.Temperature.RelativeHumidityPercent)
 
 	result := BomSummary{
 		LocationName: locationName,
@@ -141,72 +172,6 @@ func parseHtml(html string) (BomSummary, error) {
 		IconName:     iconName,
 		Rain:         []RainData{},
 	}
-
-	/*
-		doc.Find(".pme table tbody tr").EachWithBreak(func(i int, s *goquery.Selection) bool {
-			if i == 0 {
-				return true // Skip the first row
-			}
-
-			time := s.Find("td.time").Text()
-			// regex for this string: 7:00 am - 10:00 am
-			rg := regexp.MustCompile(`(\d+):\d+\s([ap]m)\s-\s(\d+):\d+\s([ap]m)`)
-			matches := rg.FindStringSubmatch(time)
-
-			rd := RainData{}
-
-			fmt.Printf("matches: %v\n", matches)
-			if v, err := strconv.Atoi(matches[1]); err != nil {
-				log.Printf("failed to parse hour start: %v", err)
-			} else {
-				rd.HourStart = v
-			}
-
-			if matches[2] == "pm" {
-				rd.HourStart += 12
-			}
-
-			if v, err := strconv.Atoi(matches[3]); err != nil {
-				log.Printf("failed to parse hour end: %v", err)
-			} else {
-				rd.HourEnd = v
-			}
-
-			if matches[4] == "pm" {
-				rd.HourEnd += 12
-			}
-
-			rainfallString := s.Find(".amt").Text()
-			if strings.Contains(rainfallString, " - ") {
-				rainfallString = strings.TrimSpace(strings.Split(rainfallString, " - ")[0])
-				rainfallString = strings.ReplaceAll(rainfallString, " mm", "")
-				if v, err := strconv.Atoi(rainfallString); err != nil {
-					log.Printf("failed to parse rainfall: %v", err)
-				} else {
-					rd.RainfallMills = v
-				}
-			} else {
-				rainfallString = strings.ReplaceAll(rainfallString, " mm", "")
-				if v, err := strconv.Atoi(rainfallString); err != nil {
-					log.Printf("failed to parse rainfall: %v", err)
-				} else {
-					rd.RainfallMills = v
-				}
-			}
-
-			chance := s.Find(".coaf").Text()
-			chance = strings.TrimSpace(strings.ReplaceAll(chance, "%", ""))
-			if v, err := strconv.Atoi(chance); err != nil {
-				log.Printf("failed to parse chance: %v", err)
-				return true
-			} else {
-				rd.ChancePercentage = v
-			}
-
-			result.Rain = append(result.Rain, rd)
-			return true
-		})
-	*/
 
 	return result, nil
 }
