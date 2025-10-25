@@ -2,8 +2,8 @@ package bom
 
 import "time"
 
-// ForecastResponse represents the complete BOM forecast API response
-type ForecastResponse struct {
+// ForecastTextsResponse represents the complete BOM forecast API response
+type ForecastTextsResponse struct {
 	Metadata Metadata `json:"meta"`
 	Forecast Forecast `json:"fcst"`
 }

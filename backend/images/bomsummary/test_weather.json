@@ -1,0 +1,74 @@
+{
+    "stn": {
+        "identity": {
+            "bom_stn_num": 40913,
+            "river_stn_id": null,
+            "bom_stn_name": "BRISBANE",
+            "wmo_stn_id": 94576,
+            "wigos_stn_id": null,
+            "ht_above_msl": 8.13,
+            "ht_barometer": 8.3
+        },
+        "location": {
+            "lat_dec_deg": -27.4808,
+            "long_dec_deg": 153.0389,
+            "timezone": "Australia/Brisbane"
+        }
+    },
+    "obs": {
+        "datetime_utc": "2025-10-25T06:30:00Z",
+        "temp": {
+            "dry_bulb_1min_cel": 25.7,
+            "apparent_1min_cel": 26.11,
+            "dew_pnt_1min_cel": 17.09,
+            "wet_bulb_1min_avg_cel": 20.34,
+            "wet_bulb_globe_sun_cel": null,
+            "wet_bulb_globe_shade_cel": 21.95,
+            "wet_bulb_depression_cel": 5.36,
+            "dry_bulb_max_cel": 28.4,
+            "dry_bulb_max_time_utc": "2025-10-25T00:57:00Z",
+            "dry_bulb_min_cel": 22.0,
+            "dry_bulb_min_time_utc": "2025-10-24T13:24:00Z",
+            "rel_hum_percent": 59.0
+        },
+        "pres": {
+            "stn_lvl_hpa": null,
+            "msl_hpa": 1014.0,
+            "qnh_hpa": null
+        },
+        "wind": {
+            "speed_10m_mps": 3.231,
+            "dirn_10m_ord": "ENE",
+            "gust_speed_10m_mps": 5.35,
+            "gust_dirn_10m_deg_t": 93.0,
+            "gust_speed_10m_max_mps": 7.768,
+            "gust_10m_max_utc": "2025-10-25T01:38:00Z",
+            "run_2m_total_m": null
+        },
+        "precip": {
+            "since_0900lct_total_mm": 0.0,
+            "since_0000lct_total_mm": 0.0,
+            "24h_0900lct_total_mm": 0.0,
+            "10min_total_mm": 0.0,
+            "1h_total_mm": 0.0,
+            "24h_total_mm": null
+        },
+        "visibility": {
+            "horiz_m": null
+        },
+        "cloud": {
+            "base_ht_s1_m": null,
+            "base_ht_s2_m": null,
+            "base_ht_s3_m": null,
+            "base_ht_s4_m": null,
+            "base_ht_s5_m": null,
+            "total_cover_amt_text": null,
+            "low_layer_cover_amt_okta": null,
+            "low_layer_height_m": null,
+            "med_layer_cover_amt_okta": null,
+            "med_layer_height_m": null,
+            "high_layer_cover_amt_okta": null,
+            "high_layer_height_m": null
+        }
+    }
+}

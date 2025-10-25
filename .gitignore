@@ -2,3 +2,4 @@
 dashboard/src/wifi_creds.h
 helvetica.ttf
 backend/epaper-dashboard
+backend/**/out.png

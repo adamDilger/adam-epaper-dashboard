@@ -1,0 +1,629 @@
+{
+    "meta": {
+        "issue_time_utc": "2025-10-25T06:54:14Z",
+        "issue_time_next_utc": "2025-10-25T11:00:00Z",
+        "local_timezone": "Australia/Brisbane"
+    },
+    "fcst": {
+        "summary": {
+            "region_text": "A weak ridge persists along the east coast. A weak trough extends from the northwest to the southeast of the state and will linger for the next day or two. A new trough will move into the southwest on Sunday and into eastern Queensland on Monday. Deeper moisture will be drawn over much of the state as this trough approaches the coast, before moving offshore later Tuesday or Wednesday.",
+            "region_coastal_text": null,
+            "sub_region_coastal_text": null,
+            "sub_region_text": null,
+            "public_district_text": null,
+            "seas_text": null,
+            "coast_text": null,
+            "locality_text": null
+        },
+        "daily": [
+            {
+                "date_utc": "2025-10-24T14:00:00Z",
+                "atm": {
+                    "surf_air": {
+                        "radiation": {
+                            "advice_summary": {
+                                "metropolitan_text": null,
+                                "public_district_text": null,
+                                "locality_text": null
+                            }
+                        },
+                        "wind": {
+                            "coastal": {
+                                "coast_text": "East to southeasterly 10 to 15 knots turning northeasterly in the late evening."
+                            },
+                            "warning_summary": {
+                                "coast_text": null
+                            }
+                        },
+                        "weather": {
+                            "precis_text": "Partly cloudy.",
+                            "locality_text": "Partly cloudy. Slight chance of a shower later tonight. Winds easterly 20 to 30 km/h becoming light in the late evening.",
+                            "region_text": "Isolated showers and thunderstorms in central districts south of Mackay and north of Bundaberg to the Carnarvon Ranges. The chance of a shower or thunderstorm about the Gulf Country. Isolated showers about the east coast north of Cooktown and in the far southwest. Partly cloudy elsewhere in southern Queensland, mostly clear elsewhere. Possible smoke haze about northern and Queensland. Light to moderate northeast to southeasterly winds.",
+                            "public_district_text": "Partly cloudy. Slight chance of a shower. Winds easterly 20 to 30 km/h becoming light in the late evening.",
+                            "metropolitan_text": "Partly cloudy. Slight chance of a shower. Winds easterly 20 to 30 km/h becoming light in the late evening.",
+                            "seas_text": null,
+                            "coast_text": "Cloudy."
+                        },
+                        "heatwave": {
+                            "country_text": null,
+                            "link_map_image": null
+                        },
+                        "tropical_system_situation": {
+                            "coast_text": null
+                        }
+                    }
+                },
+                "ocn": {
+                    "surf_water": {
+                        "caution": {
+                            "coast_text": null
+                        },
+                        "sea_height_summary": {
+                            "coast_text": "Below 1 metre."
+                        },
+                        "swell_1st_summary": {
+                            "coast_text": null
+                        },
+                        "swell_2nd_summary": {
+                            "coast_text": null
+                        },
+                        "wave_summary": {
+                            "coast_text": null
+                        },
+                        "surf_danger": {
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null
+                        }
+                    }
+                },
+                "terr": {
+                    "surf_land": {
+                        "fire_danger": {
+                            "rating": {
+                                "fire_district_code": null,
+                                "public_district_code": null
+                            },
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null,
+                            "region_text": null
+                        }
+                    }
+                }
+            },
+            {
+                "date_utc": "2025-10-25T14:00:00Z",
+                "atm": {
+                    "surf_air": {
+                        "radiation": {
+                            "advice_summary": {
+                                "metropolitan_text": "Sun protection 7:40am to 3:10pm, UV Index predicted to reach 10 [Very High]",
+                                "public_district_text": "Sun protection 7:40am to 3:10pm, UV Index predicted to reach 10 [Very High]",
+                                "locality_text": "Sun protection 7:40am to 3:10pm, UV Index predicted to reach 10 [Very High]"
+                            }
+                        },
+                        "wind": {
+                            "coastal": {
+                                "coast_text": "Northeasterly 10 to 15 knots becoming variable below 10 knots before dawn then becoming northerly 15 to 20 knots in the middle of the day. Winds reaching up to 30 knots in the eastern bay in the evening."
+                            },
+                            "warning_summary": {
+                                "coast_text": "Strong Wind Warning for Sunday for Moreton Bay"
+                            }
+                        },
+                        "weather": {
+                            "precis_text": "Showers. Storm developing.",
+                            "locality_text": "Partly cloudy. High chance of showers, most likely in the late morning and afternoon. A thunderstorm likely in the afternoon and evening, possibly severe with damaging winds and large hail. Light winds becoming northerly 15 to 25 km/h in the middle of the day then becoming light in the late evening.",
+                            "region_text": "Isolated to scattered showers and thunderstorms from the southeast to the Central Highlands. Severe thunderstorms possible in central and southern Queensland south of the Carnarvon Ranges to Maryborough and east of Roma, and likely inland in southeast Queensland. The chance of a shower or thunderstorm about interior and western Queensland. Isolated showers over northern Cape York Peninsula. Mostly sunny elsewhere. Possible morning fog about the Scenic Rim and North Tropical Coast. Light to moderate northeast to northwesterly winds, tending east to southeasterly about the Peninsula. A moderate to locally fresh west to southwesterly wind change extending across the southwest and southern interior in the afternoon and evening. Maximum temperatures well above average about southern and central Queensland, above average elsewhere. Severe heatwave conditions in northern, central, and eastern districts.",
+                            "public_district_text": "Partly cloudy. High chance of showers, most likely in the late morning and afternoon. A thunderstorm likely in the afternoon and evening, possibly severe with damaging winds, large hail and heavy rain which may lead to flash flooding. Light winds becoming north to northwesterly 15 to 25 km/h in the morning. Overnight temperatures falling to between 15 and 19 with daytime temperatures reaching the low to mid 30s.",
+                            "metropolitan_text": "Partly cloudy. High chance of showers, most likely in the late morning and afternoon. A thunderstorm likely in the afternoon and evening, possibly severe with damaging winds, large hail and heavy rain which may lead to flash flooding. Light winds becoming northerly 15 to 25 km/h in the middle of the day.",
+                            "seas_text": null,
+                            "coast_text": "Partly cloudy. 60% chance of showers. The chance of a thunderstorm in the afternoon and evening."
+                        },
+                        "heatwave": {
+                            "country_text": null,
+                            "link_map_image": null
+                        },
+                        "tropical_system_situation": {
+                            "coast_text": null
+                        }
+                    }
+                },
+                "ocn": {
+                    "surf_water": {
+                        "caution": {
+                            "coast_text": null
+                        },
+                        "sea_height_summary": {
+                            "coast_text": "Below 1 metre, increasing to 1 to 2 metres during the afternoon."
+                        },
+                        "swell_1st_summary": {
+                            "coast_text": null
+                        },
+                        "swell_2nd_summary": {
+                            "coast_text": null
+                        },
+                        "wave_summary": {
+                            "coast_text": null
+                        },
+                        "surf_danger": {
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null
+                        }
+                    }
+                },
+                "terr": {
+                    "surf_land": {
+                        "fire_danger": {
+                            "rating": {
+                                "fire_district_code": "Moderate",
+                                "public_district_code": "Moderate"
+                            },
+                            "metropolitan_text": "Moderate",
+                            "public_district_text": null,
+                            "locality_text": "Moderate",
+                            "region_text": null
+                        }
+                    }
+                }
+            },
+            {
+                "date_utc": "2025-10-26T14:00:00Z",
+                "atm": {
+                    "surf_air": {
+                        "radiation": {
+                            "advice_summary": {
+                                "metropolitan_text": null,
+                                "public_district_text": null,
+                                "locality_text": null
+                            }
+                        },
+                        "wind": {
+                            "coastal": {
+                                "coast_text": "North to northwesterly 15 to 20 knots shifting south to southwesterly in the late evening."
+                            },
+                            "warning_summary": {
+                                "coast_text": null
+                            }
+                        },
+                        "weather": {
+                            "precis_text": "Partly cloudy.",
+                            "locality_text": "Partly cloudy. Slight chance of a shower. The chance of a thunderstorm in the afternoon and evening. Light winds becoming west to northwesterly 25 to 35 km/h in the morning then shifting southerly 15 to 20 km/h in the late evening.",
+                            "region_text": "Isolated to scattered showers and thunderstorms across most of the state south of Georgetown, less likely along the east coast north of Innisfail. Severe thunderstorms possible in central and southeast Queensland between the Caboolture and Gladstone. Maximum temperatures well above average southeast of Proserpine to Charleville, tending a little below average in the far southwest and above average elsewhere. Severe heatwave conditions contracting to Far North Queensland.",
+                            "public_district_text": "Partly cloudy. Slight chance of a shower. The chance of a thunderstorm in the afternoon and evening. Winds west to northwesterly 25 to 40 km/h tending southeast to southwesterly 15 to 20 km/h in the late evening. Overnight temperatures falling to between 18 and 21 with daytime temperatures reaching the mid to high 30s.",
+                            "metropolitan_text": "Partly cloudy. Slight chance of a shower. The chance of a thunderstorm in the afternoon and evening. Winds northwesterly 15 to 20 km/h increasing to 40 km/h before shifting southerly 15 to 20 km/h in the late evening.",
+                            "seas_text": null,
+                            "coast_text": "Sunny morning. The chance of a thunderstorm in the afternoon and evening."
+                        },
+                        "heatwave": {
+                            "country_text": null,
+                            "link_map_image": null
+                        },
+                        "tropical_system_situation": {
+                            "coast_text": null
+                        }
+                    }
+                },
+                "ocn": {
+                    "surf_water": {
+                        "caution": {
+                            "coast_text": null
+                        },
+                        "sea_height_summary": {
+                            "coast_text": "1 to 1.5 metres, decreasing to 1 metre during the morning."
+                        },
+                        "swell_1st_summary": {
+                            "coast_text": null
+                        },
+                        "swell_2nd_summary": {
+                            "coast_text": null
+                        },
+                        "wave_summary": {
+                            "coast_text": null
+                        },
+                        "surf_danger": {
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null
+                        }
+                    }
+                },
+                "terr": {
+                    "surf_land": {
+                        "fire_danger": {
+                            "rating": {
+                                "fire_district_code": "Extreme",
+                                "public_district_code": null
+                            },
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null,
+                            "region_text": null
+                        }
+                    }
+                }
+            },
+            {
+                "date_utc": "2025-10-27T14:00:00Z",
+                "atm": {
+                    "surf_air": {
+                        "radiation": {
+                            "advice_summary": {
+                                "metropolitan_text": null,
+                                "public_district_text": null,
+                                "locality_text": null
+                            }
+                        },
+                        "wind": {
+                            "coastal": {
+                                "coast_text": "Southerly 15 to 20 knots tending southeasterly 20 to 25 knots during the morning."
+                            },
+                            "warning_summary": {
+                                "coast_text": null
+                            }
+                        },
+                        "weather": {
+                            "precis_text": "Showers.",
+                            "locality_text": "Cloudy. Very high chance of showers. Winds southeasterly 15 to 25 km/h becoming light during the evening.",
+                            "region_text": "Scattered showers and isolated thunderstorms about eastern Queensland south of Cooktown. Showers tending widespread with rain at times in central and southeastern districts south of Mackay, with moderate falls possible. Severe thunderstorms with heavy rainfall possible in eastern and central districts north of Taroom to Hervey Bay and south of Moranbah. Partly cloudy about the southwest, isolated showers and thunderstorms elsewhere. Maximum temperatures above average about the east coast north of Mackay, tending near average about the southern and central interior and below average elsewhere. Severe heatwave conditions contracting to the northern Cape York Peninsula.",
+                            "public_district_text": "Cloudy. Very high chance of showers. The chance of a thunderstorm in the north in the afternoon and evening. Winds southeasterly 20 to 30 km/h. Overnight temperatures falling to between 15 and 19 with daytime temperatures reaching between 19 and 23.",
+                            "metropolitan_text": "Cloudy. Very high chance of showers. The chance of a thunderstorm in the afternoon and evening. Winds southeasterly 20 to 30 km/h.",
+                            "seas_text": null,
+                            "coast_text": "Cloudy. 95% chance of showers. The chance of a thunderstorm in the evening."
+                        },
+                        "heatwave": {
+                            "country_text": null,
+                            "link_map_image": null
+                        },
+                        "tropical_system_situation": {
+                            "coast_text": null
+                        }
+                    }
+                },
+                "ocn": {
+                    "surf_water": {
+                        "caution": {
+                            "coast_text": null
+                        },
+                        "sea_height_summary": {
+                            "coast_text": "1 to 1.5 metres."
+                        },
+                        "swell_1st_summary": {
+                            "coast_text": null
+                        },
+                        "swell_2nd_summary": {
+                            "coast_text": null
+                        },
+                        "wave_summary": {
+                            "coast_text": null
+                        },
+                        "surf_danger": {
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null
+                        }
+                    }
+                },
+                "terr": {
+                    "surf_land": {
+                        "fire_danger": {
+                            "rating": {
+                                "fire_district_code": "Moderate",
+                                "public_district_code": null
+                            },
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null,
+                            "region_text": null
+                        }
+                    }
+                }
+            },
+            {
+                "date_utc": "2025-10-28T14:00:00Z",
+                "atm": {
+                    "surf_air": {
+                        "radiation": {
+                            "advice_summary": {
+                                "metropolitan_text": null,
+                                "public_district_text": null,
+                                "locality_text": null
+                            }
+                        },
+                        "wind": {
+                            "coastal": {
+                                "coast_text": null
+                            },
+                            "warning_summary": {
+                                "coast_text": null
+                            }
+                        },
+                        "weather": {
+                            "precis_text": "Shower or two.",
+                            "locality_text": "Partly cloudy. Medium chance of showers, most likely in the morning and afternoon. The chance of a thunderstorm in the afternoon and evening. Light winds becoming east to southeasterly 15 to 20 km/h during the day then becoming light during the evening.",
+                            "region_text": "Isolated showers and thunderstorms about the Gulf Country and eastern and interior districts east of about Hughenden to Roma. Showers tending scattered about the east coast and Far North Queensland. Mostly sunny elsewhere. Maximum temperatures above average about the tropical east, central and southern interior, tending below average in the southeast and near average elsewhere. Severe heatwave conditions about northern Cape York Peninsula.",
+                            "public_district_text": "Partly cloudy. Medium chance of showers, most likely in the morning and afternoon. The chance of a thunderstorm in the afternoon and evening. Winds south to southeasterly 15 to 20 km/h tending east to southeasterly during the day then becoming light during the evening. Overnight temperatures falling to between 13 and 17 with daytime temperatures reaching the low to mid 20s.",
+                            "metropolitan_text": "Partly cloudy. Medium chance of showers, most likely in the morning and afternoon. The chance of a thunderstorm in the afternoon and evening. Light winds becoming east to southeasterly 15 to 20 km/h during the day then becoming light during the evening.",
+                            "seas_text": null,
+                            "coast_text": null
+                        },
+                        "heatwave": {
+                            "country_text": null,
+                            "link_map_image": null
+                        },
+                        "tropical_system_situation": {
+                            "coast_text": null
+                        }
+                    }
+                },
+                "ocn": {
+                    "surf_water": {
+                        "caution": {
+                            "coast_text": null
+                        },
+                        "sea_height_summary": {
+                            "coast_text": null
+                        },
+                        "swell_1st_summary": {
+                            "coast_text": null
+                        },
+                        "swell_2nd_summary": {
+                            "coast_text": null
+                        },
+                        "wave_summary": {
+                            "coast_text": null
+                        },
+                        "surf_danger": {
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null
+                        }
+                    }
+                },
+                "terr": {
+                    "surf_land": {
+                        "fire_danger": {
+                            "rating": {
+                                "fire_district_code": "No Rating",
+                                "public_district_code": null
+                            },
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null,
+                            "region_text": null
+                        }
+                    }
+                }
+            },
+            {
+                "date_utc": "2025-10-29T14:00:00Z",
+                "atm": {
+                    "surf_air": {
+                        "radiation": {
+                            "advice_summary": {
+                                "metropolitan_text": null,
+                                "public_district_text": null,
+                                "locality_text": null
+                            }
+                        },
+                        "wind": {
+                            "coastal": {
+                                "coast_text": null
+                            },
+                            "warning_summary": {
+                                "coast_text": null
+                            }
+                        },
+                        "weather": {
+                            "precis_text": "Possible shower.",
+                            "locality_text": "Partly cloudy. Medium chance of showers. The chance of a thunderstorm. Light winds becoming northeasterly 15 to 20 km/h during the day.",
+                            "region_text": null,
+                            "public_district_text": null,
+                            "metropolitan_text": "Partly cloudy. Medium chance of showers. The chance of a thunderstorm. Light winds becoming northeasterly 15 to 20 km/h during the day.",
+                            "seas_text": null,
+                            "coast_text": null
+                        },
+                        "heatwave": {
+                            "country_text": null,
+                            "link_map_image": null
+                        },
+                        "tropical_system_situation": {
+                            "coast_text": null
+                        }
+                    }
+                },
+                "ocn": {
+                    "surf_water": {
+                        "caution": {
+                            "coast_text": null
+                        },
+                        "sea_height_summary": {
+                            "coast_text": null
+                        },
+                        "swell_1st_summary": {
+                            "coast_text": null
+                        },
+                        "swell_2nd_summary": {
+                            "coast_text": null
+                        },
+                        "wave_summary": {
+                            "coast_text": null
+                        },
+                        "surf_danger": {
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null
+                        }
+                    }
+                },
+                "terr": {
+                    "surf_land": {
+                        "fire_danger": {
+                            "rating": {
+                                "fire_district_code": null,
+                                "public_district_code": null
+                            },
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null,
+                            "region_text": null
+                        }
+                    }
+                }
+            },
+            {
+                "date_utc": "2025-10-30T14:00:00Z",
+                "atm": {
+                    "surf_air": {
+                        "radiation": {
+                            "advice_summary": {
+                                "metropolitan_text": null,
+                                "public_district_text": null,
+                                "locality_text": null
+                            }
+                        },
+                        "wind": {
+                            "coastal": {
+                                "coast_text": null
+                            },
+                            "warning_summary": {
+                                "coast_text": null
+                            }
+                        },
+                        "weather": {
+                            "precis_text": "Possible shower.",
+                            "locality_text": "Partly cloudy. Medium chance of showers. Light winds becoming northeasterly 15 to 20 km/h during the day.",
+                            "region_text": null,
+                            "public_district_text": null,
+                            "metropolitan_text": "Partly cloudy. Medium chance of showers. Light winds becoming northeasterly 15 to 20 km/h during the day.",
+                            "seas_text": null,
+                            "coast_text": null
+                        },
+                        "heatwave": {
+                            "country_text": null,
+                            "link_map_image": null
+                        },
+                        "tropical_system_situation": {
+                            "coast_text": null
+                        }
+                    }
+                },
+                "ocn": {
+                    "surf_water": {
+                        "caution": {
+                            "coast_text": null
+                        },
+                        "sea_height_summary": {
+                            "coast_text": null
+                        },
+                        "swell_1st_summary": {
+                            "coast_text": null
+                        },
+                        "swell_2nd_summary": {
+                            "coast_text": null
+                        },
+                        "wave_summary": {
+                            "coast_text": null
+                        },
+                        "surf_danger": {
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null
+                        }
+                    }
+                },
+                "terr": {
+                    "surf_land": {
+                        "fire_danger": {
+                            "rating": {
+                                "fire_district_code": null,
+                                "public_district_code": null
+                            },
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null,
+                            "region_text": null
+                        }
+                    }
+                }
+            },
+            {
+                "date_utc": "2025-10-31T14:00:00Z",
+                "atm": {
+                    "surf_air": {
+                        "radiation": {
+                            "advice_summary": {
+                                "metropolitan_text": null,
+                                "public_district_text": null,
+                                "locality_text": null
+                            }
+                        },
+                        "wind": {
+                            "coastal": {
+                                "coast_text": null
+                            },
+                            "warning_summary": {
+                                "coast_text": null
+                            }
+                        },
+                        "weather": {
+                            "precis_text": "Partly cloudy.",
+                            "locality_text": "Partly cloudy. Slight chance of a shower. Light winds becoming northeasterly 15 to 20 km/h during the day.",
+                            "region_text": null,
+                            "public_district_text": null,
+                            "metropolitan_text": "Partly cloudy. Slight chance of a shower. Light winds becoming northeasterly 15 to 20 km/h during the day.",
+                            "seas_text": null,
+                            "coast_text": null
+                        },
+                        "heatwave": {
+                            "country_text": null,
+                            "link_map_image": null
+                        },
+                        "tropical_system_situation": {
+                            "coast_text": null
+                        }
+                    }
+                },
+                "ocn": {
+                    "surf_water": {
+                        "caution": {
+                            "coast_text": null
+                        },
+                        "sea_height_summary": {
+                            "coast_text": null
+                        },
+                        "swell_1st_summary": {
+                            "coast_text": null
+                        },
+                        "swell_2nd_summary": {
+                            "coast_text": null
+                        },
+                        "wave_summary": {
+                            "coast_text": null
+                        },
+                        "surf_danger": {
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null
+                        }
+                    }
+                },
+                "terr": {
+                    "surf_land": {
+                        "fire_danger": {
+                            "rating": {
+                                "fire_district_code": null,
+                                "public_district_code": null
+                            },
+                            "metropolitan_text": null,
+                            "public_district_text": null,
+                            "locality_text": null,
+                            "region_text": null
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

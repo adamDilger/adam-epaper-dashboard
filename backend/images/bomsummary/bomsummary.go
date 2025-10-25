@@ -3,6 +3,7 @@ package bomsummary
 import (
 	"embed"
 	"epaper-dashboard/bom"
+	"fmt"
 	"image"
 	"image/color"
 	"sync"
@@ -33,8 +34,13 @@ func BomSummaryImage(WIDTH, HEIGHT int, a bom.BomSummary) image.Image {
 	dc.SetFontFace(fonts.helvetica.extralarge)
 	dc.DrawStringAnchored(a.CurrentTemp, 750, float64(HEIGHT)/2, 1, 0.5)
 
-	dc.SetFontFace(fonts.helvetica.large)
-	dc.DrawStringAnchored(a.Summary, 750, 400, 1, 0.5)
+	if len(a.Summary) > 13 {
+		dc.SetFontFace(fonts.helvetica.medium)
+		dc.DrawStringAnchored(a.Summary, 750, 430, 1, 0)
+	} else {
+		dc.SetFontFace(fonts.helvetica.large)
+		dc.DrawStringAnchored(a.Summary, 750, 430, 1, 0)
+	}
 
 	dc.SetFontFace(fonts.helvetica.medium)
 	w, _ := dc.MeasureString(a.TodaysMax)
@@ -50,13 +56,20 @@ func BomSummaryImage(WIDTH, HEIGHT int, a bom.BomSummary) image.Image {
 	dc.SetFontFace(fonts.helvetica.extrasmall)
 	dc.DrawStringAnchored("Humidity", 740-w, 120, 1, 0)
 
-	// TODO:
-	// iconImageFile, err := icons.Open(fmt.Sprintf("icons/%s", a.IconName))
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// iconImage, _, err := image.Decode(iconImageFile)
-	// dc.DrawImage(iconImage, 10, 10)
+	iconCode := a.IconCode
+	if iconDefinition, ok := IconDefinitionMap[iconCode]; ok {
+		iconImageFile, err := icons.Open(fmt.Sprintf("icons/%s.png", iconDefinition.DayIconName))
+		if err != nil {
+			fmt.Println("Failed to open icon image:", err)
+		} else {
+			iconImage, _, err := image.Decode(iconImageFile)
+			if err != nil {
+				fmt.Println("Failed to decode icon image:", err)
+			} else {
+				dc.DrawImage(iconImage, 10, 10)
+			}
+		}
+	}
 
 	nowString := time.Now().Format("3:04pm 2/1/06")
 	dc.SetFontFace(fonts.helvetica.extraextrasmall)

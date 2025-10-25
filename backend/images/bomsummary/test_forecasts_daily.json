@@ -1,0 +1,306 @@
+{
+  "meta": {
+    "issue_time_utc": "2025-10-25T21:00:17Z",
+    "issue_time_next_utc": "2025-10-26T07:00:00Z",
+    "local_timezone": "Australia/Brisbane"
+  },
+  "fcst": {
+    "daily": [
+      {
+        "date_utc": "2025-10-25T14:00:00Z",
+        "atm": {
+          "surf_air": {
+            "temp_max_cel": 31.800001,
+            "temp_min_cel": 20.300001,
+            "precip": {
+              "exceeding_10percentchance_total_mm": 23.2,
+              "exceeding_25percentchance_total_mm": 12.4,
+              "exceeding_50percentchance_total_mm": 4.4,
+              "exceeding_75percentchance_total_mm": 0.3,
+              "any_probability_percent": 77.0,
+              "any_restofday_probability_percent": 4.0,
+              "10mm_probability_percent": 31.0,
+              "25mm_probability_percent": 8.0
+            },
+            "weather": {
+              "icon_code": 16
+            },
+            "radiation": {
+              "uv_clear_sky_max_code": 9.957611,
+              "uv_period_start": "2025-10-25T21:50:00Z",
+              "uv_period_end": "2025-10-26T05:10:00Z"
+            }
+          }
+        },
+        "terr": {
+          "surf_land": {
+            "snow": {}
+          }
+        },
+        "ocn": {
+          "surf_water": {
+            "sea": {}
+          }
+        },
+        "astro": {
+          "sunrise_utc": null,
+          "sunset_utc": null
+        }
+      },
+      {
+        "date_utc": "2025-10-26T14:00:00Z",
+        "atm": {
+          "surf_air": {
+            "temp_max_cel": 36.3,
+            "temp_min_cel": 22.5,
+            "precip": {
+              "exceeding_10percentchance_total_mm": 1.8,
+              "exceeding_25percentchance_total_mm": 0.2,
+              "exceeding_50percentchance_total_mm": 0.0,
+              "exceeding_75percentchance_total_mm": 0.0,
+              "any_probability_percent": 26.0,
+              "any_restofday_probability_percent": 16.0,
+              "10mm_probability_percent": 3.0,
+              "25mm_probability_percent": 1.0
+            },
+            "weather": {
+              "icon_code": 3
+            },
+            "radiation": {
+              "uv_clear_sky_max_code": 10.26321,
+              "uv_period_start": "2025-10-26T21:40:00Z",
+              "uv_period_end": "2025-10-27T05:10:00Z"
+            }
+          }
+        },
+        "terr": {
+          "surf_land": {
+            "snow": {}
+          }
+        },
+        "ocn": {
+          "surf_water": {
+            "sea": {}
+          }
+        },
+        "astro": {
+          "sunrise_utc": null,
+          "sunset_utc": null
+        }
+      },
+      {
+        "date_utc": "2025-10-27T14:00:00Z",
+        "atm": {
+          "surf_air": {
+            "temp_max_cel": 21.5,
+            "temp_min_cel": 18.9,
+            "precip": {
+              "exceeding_10percentchance_total_mm": 51.7,
+              "exceeding_25percentchance_total_mm": 36.8,
+              "exceeding_50percentchance_total_mm": 21.6,
+              "exceeding_75percentchance_total_mm": 10.2,
+              "any_probability_percent": 94.0,
+              "10mm_probability_percent": 76.0,
+              "25mm_probability_percent": 43.0
+            },
+            "weather": {
+              "icon_code": 11
+            },
+            "radiation": {
+              "uv_clear_sky_max_code": 10.75974,
+              "uv_period_start": "2025-10-27T21:40:00Z",
+              "uv_period_end": "2025-10-28T05:20:00Z"
+            }
+          }
+        },
+        "terr": {
+          "surf_land": {
+            "snow": {}
+          }
+        },
+        "ocn": {
+          "surf_water": {
+            "sea": {}
+          }
+        },
+        "astro": {
+          "sunrise_utc": null,
+          "sunset_utc": null
+        }
+      },
+      {
+        "date_utc": "2025-10-28T14:00:00Z",
+        "atm": {
+          "surf_air": {
+            "temp_max_cel": 24.6,
+            "temp_min_cel": 17.300001,
+            "precip": {
+              "exceeding_10percentchance_total_mm": 7.5,
+              "exceeding_25percentchance_total_mm": 2.3,
+              "exceeding_50percentchance_total_mm": 0.2,
+              "exceeding_75percentchance_total_mm": 0.0,
+              "any_probability_percent": 50.0,
+              "10mm_probability_percent": 7.0,
+              "25mm_probability_percent": 2.0
+            },
+            "weather": {
+              "icon_code": 11
+            },
+            "radiation": {
+              "uv_clear_sky_max_code": 9.914804,
+              "uv_period_start": "2025-10-28T21:40:00Z",
+              "uv_period_end": "2025-10-29T05:10:00Z"
+            }
+          }
+        },
+        "terr": {
+          "surf_land": {
+            "snow": {}
+          }
+        },
+        "ocn": {
+          "surf_water": {
+            "sea": {}
+          }
+        },
+        "astro": {
+          "sunrise_utc": null,
+          "sunset_utc": null
+        }
+      },
+      {
+        "date_utc": "2025-10-29T14:00:00Z",
+        "atm": {
+          "surf_air": {
+            "temp_max_cel": 28.800001,
+            "temp_min_cel": 17.7,
+            "precip": {
+              "exceeding_10percentchance_total_mm": 2.6,
+              "exceeding_25percentchance_total_mm": 0.2,
+              "exceeding_50percentchance_total_mm": 0.0,
+              "exceeding_75percentchance_total_mm": 0.0,
+              "any_probability_percent": 26.0,
+              "10mm_probability_percent": 3.0,
+              "25mm_probability_percent": 1.0
+            },
+            "weather": {
+              "icon_code": 3
+            },
+            "radiation": {}
+          }
+        },
+        "terr": {
+          "surf_land": {
+            "snow": {}
+          }
+        },
+        "ocn": {
+          "surf_water": {
+            "sea": {}
+          }
+        },
+        "astro": {
+          "sunrise_utc": null,
+          "sunset_utc": null
+        }
+      },
+      {
+        "date_utc": "2025-10-30T14:00:00Z",
+        "atm": {
+          "surf_air": {
+            "temp_max_cel": 29.5,
+            "temp_min_cel": 18.9,
+            "precip": {
+              "exceeding_10percentchance_total_mm": 2.9,
+              "exceeding_25percentchance_total_mm": 0.3,
+              "exceeding_50percentchance_total_mm": 0.0,
+              "exceeding_75percentchance_total_mm": 0.0,
+              "any_probability_percent": 29.0,
+              "10mm_probability_percent": 4.0,
+              "25mm_probability_percent": 2.0
+            },
+            "weather": {
+              "icon_code": 3
+            },
+            "radiation": {}
+          }
+        },
+        "terr": {
+          "surf_land": {
+            "snow": {}
+          }
+        },
+        "ocn": {
+          "surf_water": {
+            "sea": {}
+          }
+        },
+        "astro": {
+          "sunrise_utc": null,
+          "sunset_utc": null
+        }
+      },
+      {
+        "date_utc": "2025-10-31T14:00:00Z",
+        "atm": {
+          "surf_air": {
+            "temp_max_cel": 30.4,
+            "temp_min_cel": 20.9,
+            "precip": {
+              "exceeding_10percentchance_total_mm": 1.2,
+              "exceeding_25percentchance_total_mm": 0.0,
+              "exceeding_50percentchance_total_mm": 0.0,
+              "exceeding_75percentchance_total_mm": 0.0,
+              "any_probability_percent": 19.0,
+              "10mm_probability_percent": 3.0,
+              "25mm_probability_percent": 1.0
+            },
+            "weather": {
+              "icon_code": 3
+            },
+            "radiation": {}
+          }
+        },
+        "terr": {
+          "surf_land": {
+            "snow": {}
+          }
+        },
+        "ocn": {
+          "surf_water": {
+            "sea": {}
+          }
+        },
+        "astro": {
+          "sunrise_utc": null,
+          "sunset_utc": null
+        }
+      },
+      {
+        "date_utc": "2025-11-01T14:00:00Z",
+        "atm": {
+          "surf_air": {
+            "temp_min_cel": 19.300001,
+            "precip": {},
+            "weather": {},
+            "radiation": {}
+          }
+        },
+        "terr": {
+          "surf_land": {
+            "snow": {}
+          }
+        },
+        "ocn": {
+          "surf_water": {
+            "sea": {}
+          }
+        },
+        "astro": {
+          "sunrise_utc": null,
+          "sunset_utc": null
+        }
+      }
+    ]
+  }
+}

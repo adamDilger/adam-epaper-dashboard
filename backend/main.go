@@ -3,6 +3,7 @@ package main
 import (
 	"epaper-dashboard/bom"
 	"epaper-dashboard/images/bomsummary"
+	"epaper-dashboard/images/errorimage"
 	"epaper-dashboard/processing"
 	"fmt"
 	"image"
@@ -26,20 +27,22 @@ func main() {
 			// send back the image
 
 			var m image.Image
-			a, err := bom.GetBomSummary()
+			bomData, err := bom.GetBomSummary()
 			if err != nil {
 				log.Println("Error getting BOM summary:", err)
 				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte("Error fetching data: " + err.Error()))
 				return
 			}
 
-			m = bomsummary.BomSummaryImage(WIDTH, HEIGHT, a)
+			m = bomsummary.BomSummaryImage(WIDTH, HEIGHT, bomData)
 
 			w.Header().Set("Content-Type", "image/png")
 			err = png.Encode(w, m)
 			if err != nil {
 				log.Println("Error encoding image:", err)
 				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte("Error encoding image: " + err.Error()))
 			}
 
 			return
@@ -47,10 +50,7 @@ func main() {
 
 		log.Println("Serving image")
 
-		var image Image
-
-		image = weatherSummary()
-
+		image := weatherSummary()
 		headers := []uint8{
 			1,                     // format version
 			image.durationMinutes, // duration in minutes to display
@@ -79,7 +79,13 @@ type Image struct {
 func weatherSummary() Image {
 	a, err := bom.GetBomSummary()
 	if err != nil {
-		panic(err)
+		image := errorimage.ErrorImage(WIDTH, HEIGHT, time.Now())
+		data := processing.ConvertContextToBoolArray(image)
+
+		return Image{
+			durationMinutes: 5,
+			data:            processing.ConvertBoolArrayToBytesRLE(data),
+		}
 	}
 
 	image := bomsummary.BomSummaryImage(WIDTH, HEIGHT, a)

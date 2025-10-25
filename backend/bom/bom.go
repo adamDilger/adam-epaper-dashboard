@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"sync"
 	"time"
 )
@@ -26,43 +25,66 @@ type BomSummary struct {
 	TodaysMax    string
 	Humidity     string
 	Summary      string
-	IconName     string
+	IconCode     int
 	Rain         []RainData
 }
 
-func getBomSummaryJson() (io.ReadCloser, io.ReadCloser, error) {
-	weatherUrl := "https://api.bom.gov.au/apikey/v1/observations/latest/40913/atm/surf_air?include_qc_results=false"
-	forecastUrl := "https://api.bom.gov.au/apikey/v1/forecasts/texts?aac=QLD_PW015&aac=QLD_FW015&aac=QLD_MW013&aac=QLD_FA001&aac=QLD_ME001&aac=QLD_PT001&timezone=Australia%2FBrisbane"
-
-	resp, err := http.NewRequest(http.MethodGet, weatherUrl, nil)
+func makeRequest(url, description string) (io.ReadCloser, error) {
+	resp, err := http.NewRequest(http.MethodGet, url, nil)
 	resp.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
 
 	if err != nil {
-		return nil, nil, err
+		return nil, fmt.Errorf("failed to build request for %s: %v", description, err)
 	}
 
-	weatherResponse, err := http.DefaultClient.Do(resp)
+	response, err := http.DefaultClient.Do(resp)
 
-	if err != nil {
-		return nil, nil, err
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("non-200 response for %s: %d", description, response.StatusCode)
 	}
 
-	forecastResp, err := http.NewRequest(http.MethodGet, forecastUrl, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, fmt.Errorf("failed to perform request for %s: %v", description, err)
 	}
 
-	forecastResp.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
+	return response.Body, nil
+}
 
-	forecastResponse, err := http.DefaultClient.Do(forecastResp)
+func getBomSummaryJson() (io.ReadCloser, io.ReadCloser, io.ReadCloser, error) {
+	weatherUrl := "https://api.bom.gov.au/apikey/v1/observations/latest/40913/atm/surf_air?include_qc_results=false"
+	forecastTextUrl := "https://api.bom.gov.au/apikey/v1/forecasts/texts?aac=QLD_PW015&aac=QLD_FW015&aac=QLD_MW013&aac=QLD_FA001&aac=QLD_ME001&aac=QLD_PT001&timezone=Australia%2FBrisbane"
+	forecastDailyUrl := "https://api.bom.gov.au/apikey/v1/forecasts/daily/689/350?timezone=Australia%2FBrisbane"
 
-	if err != nil {
-		return nil, nil, err
+	var weatherResponse, forecastDailyResponse, forecastTextReponse io.ReadCloser
+	var err1, err2, err3 error
+
+	var wg sync.WaitGroup
+	wg.Add(3)
+
+	go func() {
+		weatherResponse, err1 = makeRequest(weatherUrl, "Weather")
+		wg.Done()
+	}()
+	go func() {
+		forecastTextReponse, err2 = makeRequest(forecastTextUrl, "Forecast Text")
+		wg.Done()
+	}()
+	go func() {
+		forecastDailyResponse, err3 = makeRequest(forecastDailyUrl, "Forecast Daily")
+		wg.Done()
+	}()
+
+	wg.Wait()
+
+	for _, err := range []error{err1, err2, err3} {
+		if err != nil {
+			return nil, nil, nil, err
+		}
 	}
 
 	println("Fetched BOM data")
 
-	return weatherResponse.Body, forecastResponse.Body, nil
+	return weatherResponse, forecastDailyResponse, forecastTextReponse, nil
 }
 
 func toSafeTempFloat(temp float64) string {
@@ -70,31 +92,26 @@ func toSafeTempFloat(temp float64) string {
 		return "n/a"
 	}
 
-	return fmt.Sprintf("%.1f", temp)
+	return fmt.Sprintf("%.1f°", temp)
 }
 
 func GetBomSummaryTest(path string) (BomSummary, error) {
-	f, err := os.Open(path + "test_weather.json")
+	weatherFile, err := os.Open(path + "test_weather.json")
 	if err != nil {
 		return BomSummary{}, fmt.Errorf("failed to parse file: %v", err)
 	}
 
-	ff, err := os.Open(path + "test_forecast.json")
+	forecastTextsFile, err := os.Open(path + "test_forecast_texts.json")
 	if err != nil {
 		return BomSummary{}, fmt.Errorf("failed to parse forecast file: %v", err)
 	}
 
-	bytesWeather, err := io.ReadAll(f)
+	forecastDailyFile, err := os.Open(path + "test_forecast_daily.json")
 	if err != nil {
-		return BomSummary{}, fmt.Errorf("failed to read file: %v", err)
+		return BomSummary{}, fmt.Errorf("failed to parse forecast file: %v", err)
 	}
 
-	bytesForecast, err := io.ReadAll(ff)
-	if err != nil {
-		return BomSummary{}, fmt.Errorf("failed to read forecast file: %v", err)
-	}
-
-	return parseJson(strings.NewReader(string(bytesWeather)), strings.NewReader(string(bytesForecast)))
+	return parseJson(weatherFile, forecastDailyFile, forecastTextsFile)
 }
 
 var lock = sync.Mutex{}
@@ -114,53 +131,50 @@ func GetBomSummary() (BomSummary, error) {
 
 	lastFetchTime = time.Now()
 
-	weatherBody, forecastBody, err := getBomSummaryJson()
+	weatherResponse, forecastDailyResponse, forecastTextResponse, err := getBomSummaryJson()
 	if err != nil {
-		lastBomSummary = BomSummary{}
-		err = fmt.Errorf("failed to request BOM data: %v", err)
-		log.Println(err)
-		return lastBomSummary, err
+		return lastBomSummary, fmt.Errorf("failed to request BOM data: %v", err)
 	}
 
-	defer weatherBody.Close()
-	defer forecastBody.Close()
+	defer weatherResponse.Close()
+	defer forecastDailyResponse.Close()
+	defer forecastTextResponse.Close()
 
-	lastBomSummary, err = parseJson(weatherBody, forecastBody)
+	lastBomSummary, err = parseJson(weatherResponse, forecastDailyResponse, forecastTextResponse)
 	if err != nil {
-		lastBomSummary = BomSummary{}
-		err = fmt.Errorf("failed to parse BOM data: %v", err)
-		log.Println(err)
-		return lastBomSummary, err
+		return lastBomSummary, fmt.Errorf("failed to parse BOM data: %v", err)
 	}
 
 	return lastBomSummary, nil
 }
 
-func parseJson(weatherReader io.Reader, forecastReader io.Reader) (BomSummary, error) {
+func parseJson(weatherReader, forecastDailyReader, forecastTextsReader io.Reader) (BomSummary, error) {
 	var weather WeatherResponse
-	var forecast ForecastResponse
+	var forecastTexts ForecastTextsResponse
+	var forecastDaily DailyForecastsResponse
 
 	err := json.NewDecoder(weatherReader).Decode(&weather)
 	if err != nil {
 		return BomSummary{}, errors.New("failed to parse weather json: %v" + err.Error())
 	}
 
-	err = json.NewDecoder(forecastReader).Decode(&forecast)
+	err = json.NewDecoder(forecastDailyReader).Decode(&forecastDaily)
 	if err != nil {
-		return BomSummary{}, errors.New("failed to parse forecast json: %v" + err.Error())
+		return BomSummary{}, errors.New("failed to parse forecast daily json: %v" + err.Error())
+	}
+
+	err = json.NewDecoder(forecastTextsReader).Decode(&forecastTexts)
+	if err != nil {
+		return BomSummary{}, errors.New("failed to parse forecast texts json: %v" + err.Error())
 	}
 
 	locationName := "Greenslopes" // TODO: get from response
-	// locationName = locationName[0:strings.Index(locationName, "Weather")]
 
 	currentTemp := toSafeTempFloat(weather.Observation.Temperature.DryBulb1MinCel)
 	todaysMax := toSafeTempFloat(weather.Observation.Temperature.DryBulbMaxCel)
 
-	summary := forecast.Forecast.Daily[0].Atmospheric.SurfaceAir.Weather.PrecisText
-
-	// iconHref := "" // TODO: doc.Find(".forecasts .forecast-summary dd.image img").First().AttrOr("src", "")
-	iconName := "" // TODO: iconHref[strings.LastIndex(iconHref, "/")+1:]
-
+	summary := forecastTexts.Forecast.Daily[0].Atmospheric.SurfaceAir.Weather.PrecisText
+	iconCode := forecastDaily.ForecastsDaily.Daily[0].Atmospheric.SurfaceAir.Weather.IconCode
 	humidity := fmt.Sprintf("%1.f%%", weather.Observation.Temperature.RelativeHumidityPercent)
 
 	result := BomSummary{
@@ -169,7 +183,7 @@ func parseJson(weatherReader io.Reader, forecastReader io.Reader) (BomSummary, e
 		TodaysMax:    todaysMax,
 		Humidity:     humidity,
 		Summary:      summary,
-		IconName:     iconName,
+		IconCode:     iconCode,
 		Rain:         []RainData{},
 	}
 
