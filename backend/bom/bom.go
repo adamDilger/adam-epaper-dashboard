@@ -12,11 +12,16 @@ import (
 	"time"
 )
 
-type RainData struct {
-	HourStart        int
-	HourEnd          int
-	RainfallMills    int
-	ChancePercentage int
+// type RainData struct {
+// 	HourStart        int
+// 	HourEnd          int
+// 	RainfallMills    int
+// 	ChancePercentage int
+// }
+
+type RainSummary struct {
+	Chance25Percent int
+	Chance75Percent int
 }
 
 type BomSummary struct {
@@ -27,7 +32,9 @@ type BomSummary struct {
 	Humidity             string
 	Summary              string
 	IconCode             int
-	Rain                 []RainData
+	Rain                 *RainSummary
+
+	// Rain                 []RainData
 }
 
 func makeRequest(url, description string) (io.ReadCloser, error) {
@@ -86,6 +93,10 @@ func getBomSummaryJson() (io.ReadCloser, io.ReadCloser, io.ReadCloser, error) {
 	println("Fetched BOM data")
 
 	return weatherResponse, forecastDailyResponse, forecastTextReponse, nil
+}
+
+func roundFloatToNearestInt(f float64) int {
+	return int(f + 0.5)
 }
 
 func toSafeTempFloat(temp float64) string {
@@ -177,7 +188,18 @@ func parseJson(weatherReader, forecastDailyReader, forecastTextsReader io.Reader
 
 	summary := forecastTexts.Forecast.Daily[0].Atmospheric.SurfaceAir.Weather.PrecisText
 	iconCode := forecastDaily.ForecastsDaily.Daily[0].Atmospheric.SurfaceAir.Weather.IconCode
-	humidity := fmt.Sprintf("%1.f%%", weather.Observation.Temperature.RelativeHumidityPercent)
+	humidity := fmt.Sprintf("%1.f", weather.Observation.Temperature.RelativeHumidityPercent)
+
+	var rainSummary *RainSummary
+	chanceRain25 := forecastDaily.ForecastsDaily.Daily[0].Atmospheric.SurfaceAir.Precipitation.Exceeding25PercentChanceTotalMm
+	chanceRain75 := forecastDaily.ForecastsDaily.Daily[0].Atmospheric.SurfaceAir.Precipitation.Exceeding75PercentChanceTotalMm
+
+	if chanceRain25 != nil && chanceRain75 != nil {
+		rainSummary = &RainSummary{
+			Chance25Percent: roundFloatToNearestInt(*chanceRain25),
+			Chance75Percent: roundFloatToNearestInt(*chanceRain75),
+		}
+	}
 
 	result := BomSummary{
 		LocationName:         locationName,
@@ -187,7 +209,7 @@ func parseJson(weatherReader, forecastDailyReader, forecastTextsReader io.Reader
 		Humidity:             humidity,
 		Summary:              summary,
 		IconCode:             iconCode,
-		Rain:                 []RainData{},
+		Rain:                 rainSummary,
 	}
 
 	return result, nil

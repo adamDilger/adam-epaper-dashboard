@@ -60,10 +60,23 @@ func BomSummaryImage(WIDTH, HEIGHT int, a bom.BomSummary) image.Image {
 
 	dc.SetFontFace(fonts.helvetica.medium)
 	_, h = dc.MeasureString(a.Humidity)
-	dc.DrawStringAnchored(a.Humidity, 600, 70, 1, 0)
+	dc.DrawStringAnchored(a.Humidity, 585, 70, 1, 0)
 
 	dc.SetFontFace(fonts.helvetica.extraextrasmall)
+	dc.DrawStringAnchored("%", 600, 70, 1, 0)
 	dc.DrawStringAnchored("Humidity", 600, 70+(h/2), 1, 0)
+
+	if a.Rain != nil {
+		dc.SetFontFace(fonts.helvetica.medium)
+		rain := fmt.Sprintf("%d-%d", a.Rain.Chance75Percent, a.Rain.Chance25Percent)
+		_, h = dc.MeasureString(rain)
+		dc.DrawStringAnchored(rain, 450, 70, 1, 0)
+
+		dc.SetFontFace(fonts.helvetica.extraextrasmall)
+		dc.DrawStringAnchored("mm", 475, 70, 1, 0)
+
+		dc.DrawStringAnchored("Rain", 475, 70+(h/2), 1, 0)
+	}
 
 	iconCode := a.IconCode
 	if iconDefinition, ok := IconDefinitionMap[iconCode]; ok {
