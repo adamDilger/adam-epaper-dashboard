@@ -34,6 +34,15 @@ func BomSummaryImage(WIDTH, HEIGHT int, a bom.BomSummary) image.Image {
 	dc.SetFontFace(fonts.helvetica.extralarge)
 	dc.DrawStringAnchored(a.CurrentTemp, 750, float64(HEIGHT)/2, 1, 0.5)
 
+	{
+		dc.SetFontFace(fonts.helvetica.small)
+		dc.DrawStringAnchored(a.CurrentFeelsLikeTemp, 750, float64(HEIGHT)/2+80, 1, 1)
+
+		w, h := dc.MeasureString(a.CurrentFeelsLikeTemp)
+		dc.SetFontFace(fonts.helvetica.extrasmall)
+		dc.DrawStringAnchored("Feels like ", 745-w, float64(HEIGHT)/2+80+h, 1, 0)
+	}
+
 	if len(a.Summary) > 13 {
 		dc.SetFontFace(fonts.helvetica.medium)
 		dc.DrawStringAnchored(a.Summary, 750, 430, 1, 0)
@@ -43,18 +52,18 @@ func BomSummaryImage(WIDTH, HEIGHT int, a bom.BomSummary) image.Image {
 	}
 
 	dc.SetFontFace(fonts.helvetica.medium)
-	w, _ := dc.MeasureString(a.TodaysMax)
+	_, h := dc.MeasureString(a.TodaysMax)
 	dc.DrawStringAnchored(a.TodaysMax, 750, 70, 1, 0)
 
-	dc.SetFontFace(fonts.helvetica.extrasmall)
-	dc.DrawStringAnchored("Max", 740-w, 70, 1, 0)
+	dc.SetFontFace(fonts.helvetica.extraextrasmall)
+	dc.DrawStringAnchored("Max", 750, 70+(h/2), 1, 0)
 
 	dc.SetFontFace(fonts.helvetica.medium)
-	w, _ = dc.MeasureString(a.Humidity)
-	dc.DrawStringAnchored(a.Humidity, 750, 120, 1, 0)
+	_, h = dc.MeasureString(a.Humidity)
+	dc.DrawStringAnchored(a.Humidity, 600, 70, 1, 0)
 
-	dc.SetFontFace(fonts.helvetica.extrasmall)
-	dc.DrawStringAnchored("Humidity", 740-w, 120, 1, 0)
+	dc.SetFontFace(fonts.helvetica.extraextrasmall)
+	dc.DrawStringAnchored("Humidity", 600, 70+(h/2), 1, 0)
 
 	iconCode := a.IconCode
 	if iconDefinition, ok := IconDefinitionMap[iconCode]; ok {

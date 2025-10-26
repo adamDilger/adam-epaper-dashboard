@@ -20,13 +20,14 @@ type RainData struct {
 }
 
 type BomSummary struct {
-	LocationName string
-	CurrentTemp  string
-	TodaysMax    string
-	Humidity     string
-	Summary      string
-	IconCode     int
-	Rain         []RainData
+	LocationName         string
+	CurrentTemp          string
+	CurrentFeelsLikeTemp string
+	TodaysMax            string
+	Humidity             string
+	Summary              string
+	IconCode             int
+	Rain                 []RainData
 }
 
 func makeRequest(url, description string) (io.ReadCloser, error) {
@@ -171,6 +172,7 @@ func parseJson(weatherReader, forecastDailyReader, forecastTextsReader io.Reader
 	locationName := "Greenslopes" // TODO: get from response
 
 	currentTemp := toSafeTempFloat(weather.Observation.Temperature.DryBulb1MinCel)
+	currentFeelsLikeTemp := toSafeTempFloat(weather.Observation.Temperature.Apparent1MinCel)
 	todaysMax := toSafeTempFloat(weather.Observation.Temperature.DryBulbMaxCel)
 
 	summary := forecastTexts.Forecast.Daily[0].Atmospheric.SurfaceAir.Weather.PrecisText
@@ -178,13 +180,14 @@ func parseJson(weatherReader, forecastDailyReader, forecastTextsReader io.Reader
 	humidity := fmt.Sprintf("%1.f%%", weather.Observation.Temperature.RelativeHumidityPercent)
 
 	result := BomSummary{
-		LocationName: locationName,
-		CurrentTemp:  currentTemp,
-		TodaysMax:    todaysMax,
-		Humidity:     humidity,
-		Summary:      summary,
-		IconCode:     iconCode,
-		Rain:         []RainData{},
+		LocationName:         locationName,
+		CurrentTemp:          currentTemp,
+		CurrentFeelsLikeTemp: currentFeelsLikeTemp,
+		TodaysMax:            todaysMax,
+		Humidity:             humidity,
+		Summary:              summary,
+		IconCode:             iconCode,
+		Rain:                 []RainData{},
 	}
 
 	return result, nil
