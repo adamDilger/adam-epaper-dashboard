@@ -37,7 +37,10 @@ void loop()
       &responseMetadata,
       [](int x, int y, uint8_t count)
       {
-        display.drawLine(x, y, x + count, y, GxEPD_BLACK);
+        if (count == 1)
+          display.drawPixel(x, y, GxEPD_BLACK);
+        else
+          display.drawLine(x, y, x + count - 1, y, GxEPD_BLACK);
       },
       client,
       display.width());

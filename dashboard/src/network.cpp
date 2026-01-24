@@ -51,7 +51,7 @@ int doRequest(
     }
 
     int contentLength = client.parseInt();
-    if (contentLength <= 0 || contentLength > 48000)
+    if (contentLength <= 0 || contentLength > 148000)
     {
         Serial.println("Invalid response, content length is 0 or too large");
         client.stop();
