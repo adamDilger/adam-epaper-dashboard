@@ -4,9 +4,9 @@ import (
 	"epaper-dashboard/bom"
 	"epaper-dashboard/images/bomsummary"
 	"epaper-dashboard/processing"
+	"golang.org/x/image/bmp"
 	"image"
 	"image/color"
-	"image/png"
 	"os"
 	"testing"
 )
@@ -41,12 +41,12 @@ func writeImage(data [][]bool) {
 		}
 	}
 
-	o, err := os.Create("out.png")
+	o, err := os.Create("out.bmp")
 	if err != nil {
 		panic(err)
 	}
 
-	err = png.Encode(o, i)
+	err = bmp.Encode(o, i)
 	if err != nil {
 		panic(err)
 	}

@@ -1,7 +1,7 @@
 set -e
 GOOS=linux GOARCH=amd64 go build
 
-host="root@..."
+host="root@dlgr.au"
 
 ssh $host 'systemctl stop epaper-dashboard.service'
 scp epaper-dashboard $host:~/dev/epaper-dashboard

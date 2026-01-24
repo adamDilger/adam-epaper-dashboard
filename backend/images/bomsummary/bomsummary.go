@@ -18,13 +18,16 @@ import (
 var helvetica embed.FS
 
 //go:embed icons/*.png
-var icons embed.FS
+// var icons embed.FS
+
+//go:embed svgimages/*.svg.png
+var svgicons embed.FS
 
 func BomSummaryImage(WIDTH, HEIGHT int, a bom.BomSummary) image.Image {
 	fonts := sync.OnceValue(loadFonts)()
 
 	im := image.NewRGBA(image.Rect(0, 0, WIDTH, HEIGHT))
-	dc := gg.NewContextForImage(im)
+	dc := gg.NewContextForRGBA(im)
 
 	dc.SetColor(color.Black)
 
@@ -80,7 +83,7 @@ func BomSummaryImage(WIDTH, HEIGHT int, a bom.BomSummary) image.Image {
 
 	iconCode := a.IconCode
 	if iconDefinition, ok := IconDefinitionMap[iconCode]; ok {
-		iconImageFile, err := icons.Open(fmt.Sprintf("icons/%s.png", iconDefinition.DayIconName))
+		iconImageFile, err := svgicons.Open(fmt.Sprintf("svgimages/%s.svg.png", iconDefinition.DayIconName))
 		if err != nil {
 			fmt.Println("Failed to open icon image:", err)
 		} else {
