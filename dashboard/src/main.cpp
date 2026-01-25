@@ -15,23 +15,80 @@ WiFiClient client;
 void connectToWifi();
 void screenMessage(const char *text);
 
+void testFunction()
+{
+  Serial.println("Test function called.");
+  display.setTextColor(GxEPD_BLACK);
+  display.setFont(&FreeMonoBold9pt7b);
+
+  int HEIGHT = display.height();
+  int WIDTH = display.width();
+
+  int hello = 0;
+  int halfHeight = HEIGHT / 2;
+  int halfWidth = WIDTH / 2;
+
+  while (true)
+  {
+    display.fillRect(0, 0, display.width(), display.height(), GxEPD_BLACK);
+    Serial.printf("Starting loop iteration %d\n", hello);
+
+    int squareSize = 40;
+    // draw a checkerboard pattern with squares of size squareSize
+    int rows = HEIGHT / squareSize;
+    int cols = WIDTH / squareSize;
+    for (int row = 0; row <= rows; row++)
+    {
+      for (int col = 0; col <= cols; col++)
+      {
+        if ((row + col) % 2 == 0)
+        {
+          int x = col * squareSize;
+          int y = row * squareSize;
+          display.fillRect(x, y, squareSize, squareSize, GxEPD_WHITE);
+        }
+      }
+    }
+
+    display.display(true);
+    display.powerOff();
+    hello++;
+    delay(5000);
+    Serial.println("Looping again.");
+  }
+}
+
+void fullRefresh()
+{
+  display.fillScreen(GxEPD_WHITE);
+  display.display(false);
+  delay(1000);
+}
+
+void partialRefresh()
+{
+  display.display(true);
+  display.powerOff();
+}
+
 void setup()
 {
-  Serial.begin(115200);
   display.init(115200, true, 2, false); // USE THIS for Waveshare boards with "clever" reset circuit, 2ms reset pulse
+  // testFunction();
   connectToWifi();
-
-  display.fillScreen(GxEPD_WHITE);
-  display.display(true);
 }
 
 int refreshCount = 0;
-
 void loop()
 {
   ResponseMetadata responseMetadata;
 
   display.fillScreen(GxEPD_WHITE);
+
+  if (refreshCount >= 10)
+    fullRefresh();
+  else
+    refreshCount++;
 
   doRequest(
       &responseMetadata,
@@ -45,18 +102,7 @@ void loop()
       client,
       display.width());
 
-  if (refreshCount > 10)
-  {
-    display.display(false);
-    refreshCount = 0;
-  }
-  else
-  {
-    display.display(true);
-    display.powerOff();
-    refreshCount++;
-  }
-
+  partialRefresh();
   delay(responseMetadata.durationMinutes * 60 * 1000);
 }
 
