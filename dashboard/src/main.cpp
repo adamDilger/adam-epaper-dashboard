@@ -5,12 +5,25 @@
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 #include <WiFi.h>
+#include <WiFiClient.h>
 
 #include "graphics/GxEPD2_display_selection_new_style.h"
-#include "network.h"
 #include "wifi_creds.h"
 
+#define STBI_FAILURE_USERMSG
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+// const char url[] = "https://adam-epaper-dashboard-cloudflare-api.adamdilger.workers.dev";
+const char url[] = "http://aad.dlgr.au";
+
+#include <HTTPClient.h>
+
+const int BUFFER_SIZE = 20000;
+uint8_t responseBuffer[BUFFER_SIZE] = {0};
+
 WiFiClient client;
+HTTPClient https;
 
 void connectToWifi();
 void screenMessage(const char *text);
@@ -81,29 +94,103 @@ void setup()
 int refreshCount = 0;
 void loop()
 {
-  ResponseMetadata responseMetadata;
-
   display.fillScreen(GxEPD_WHITE);
 
   if (refreshCount >= 10)
+  {
+    refreshCount = 0;
     fullRefresh();
+  }
   else
+  {
     refreshCount++;
+  }
 
-  doRequest(
-      &responseMetadata,
-      [](int x, int y, uint8_t count)
+  int bytesRead = 0;
+
+  if (https.begin(client, url))
+  {
+    int httpCode = https.GET();
+    if (httpCode == 200)
+    {
+      Serial.printf("HTTP GET code: %d\n", httpCode);
+      Serial.printf("Response size: %d\n", https.getSize());
+
+      // Serial.printf("Response type: %s\n", https.getString().c_str());
+
+      bytesRead = https.getStream().readBytes(responseBuffer, BUFFER_SIZE - 1);
+      Serial.printf("Bytes read: %d\n", bytesRead);
+
+      for (int i = 0; i < 10; i++)
       {
-        if (count == 1)
-          display.drawPixel(x, y, GxEPD_BLACK);
-        else
-          display.drawLine(x, y, x + count - 1, y, GxEPD_BLACK);
-      },
-      client,
-      display.width());
+        for (int j = 0; j < 100; j++)
+        {
+          Serial.printf("%02X ", (unsigned char)responseBuffer[j + i * 100]);
+        }
+        Serial.printf("\n");
+      }
+
+      https.end();
+    }
+    else
+    {
+      Serial.printf("HTTP GET failed, error: %d, message: %s\n", httpCode, https.errorToString(httpCode).c_str());
+      https.end();
+      return;
+    }
+
+    int y = 0;
+    int x = 0;
+    int channels = 0;
+
+    unsigned char *image = stbi_load_from_memory(
+        responseBuffer,
+        bytesRead + 1,
+        &x,
+        &y,
+        NULL,
+        1);
+
+    Serial.printf("image width: %d, height: %d, channels: %d\n", x, y, channels);
+
+    // see what's in the buffer of image, there may be an error in there
+    if (image == NULL)
+    {
+      Serial.printf("IS NULL 1\n");
+
+      const char *reason = stbi_failure_reason();
+      if (reason != NULL)
+      {
+        Serial.printf("image buffer: %s\n", reason);
+      }
+      else
+      {
+        Serial.printf("image buffer is NULL\n");
+      }
+    }
+    else
+    {
+      Serial.printf("NOT NULL\n");
+      stbi_image_free(image);
+    }
+
+    sleep(60);
+  }
+
+  // doRequest(
+  //     &responseMetadata,
+  //     [](int x, int y, uint8_t count)
+  //     {
+  //       if (count == 1)
+  //         display.drawPixel(x, y, GxEPD_BLACK);
+  //       else
+  //         display.drawLine(x, y, x + count - 1, y, GxEPD_BLACK);
+  //     },
+  //     client,
+  //     display.width());
 
   partialRefresh();
-  delay(responseMetadata.durationMinutes * 60 * 1000);
+  // delay(responseMetadata.durationMinutes * 60 * 1000);
 }
 
 void connectToWifi()
