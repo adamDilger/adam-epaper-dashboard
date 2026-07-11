@@ -10,17 +10,10 @@
 #include "graphics/GxEPD2_display_selection_new_style.h"
 #include "wifi_creds.h"
 
-#define STBI_FAILURE_USERMSG
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 // const char url[] = "https://adam-epaper-dashboard-cloudflare-api.adamdilger.workers.dev";
 const char url[] = "http://aad.dlgr.au";
 
 #include <HTTPClient.h>
-
-const int BUFFER_SIZE = 20000;
-uint8_t responseBuffer[BUFFER_SIZE] = {0};
 
 WiFiClient client;
 HTTPClient https;
@@ -106,29 +99,52 @@ void loop()
     refreshCount++;
   }
 
-  int bytesRead = 0;
+  int totalBytesRead = 0;
 
   if (https.begin(client, url))
   {
+    https.addHeader("Accept", "application/octet-stream");
+
     int httpCode = https.GET();
     if (httpCode == 200)
     {
-      Serial.printf("HTTP GET code: %d\n", httpCode);
-      Serial.printf("Response size: %d\n", https.getSize());
+      int contentLength = https.getSize();
 
-      // Serial.printf("Response type: %s\n", https.getString().c_str());
+      Serial.printf("HTTP GET %d: %d bytes\n", httpCode, contentLength);
 
-      bytesRead = https.getStream().readBytes(responseBuffer, BUFFER_SIZE - 1);
-      Serial.printf("Bytes read: %d\n", bytesRead);
+      uint8_t *responseBuffer = new uint8_t[contentLength];
 
-      for (int i = 0; i < 10; i++)
+      while (true)
       {
-        for (int j = 0; j < 100; j++)
+        if (totalBytesRead >= contentLength)
         {
-          Serial.printf("%02X ", (unsigned char)responseBuffer[j + i * 100]);
+          Serial.println("All content read.");
+          break;
         }
-        Serial.printf("\n");
+
+        int bytesRead = https.getStream().readBytes(responseBuffer, contentLength);
+        Serial.printf("%d total bytes read so far, %d bytes read this iteration\n", totalBytesRead, bytesRead);
+        totalBytesRead += bytesRead;
       }
+
+      for (int i = 0; i < totalBytesRead; i++)
+      {
+        byte b = responseBuffer[i];
+
+        const int WIDTH = display.width();
+        for (int j = 0; j < 8; j++)
+        {
+          int x = (i * 8 + j) % WIDTH;
+          int y = (i * 8 + j) / WIDTH;
+
+          if ((b & (1 << (7 - j))) != 0)
+          {
+            display.drawPixel(x, y, GxEPD_BLACK);
+          }
+        }
+      }
+
+      delete[] responseBuffer;
 
       https.end();
     }
@@ -138,43 +154,6 @@ void loop()
       https.end();
       return;
     }
-
-    int y = 0;
-    int x = 0;
-    int channels = 0;
-
-    unsigned char *image = stbi_load_from_memory(
-        responseBuffer,
-        bytesRead + 1,
-        &x,
-        &y,
-        NULL,
-        1);
-
-    Serial.printf("image width: %d, height: %d, channels: %d\n", x, y, channels);
-
-    // see what's in the buffer of image, there may be an error in there
-    if (image == NULL)
-    {
-      Serial.printf("IS NULL 1\n");
-
-      const char *reason = stbi_failure_reason();
-      if (reason != NULL)
-      {
-        Serial.printf("image buffer: %s\n", reason);
-      }
-      else
-      {
-        Serial.printf("image buffer is NULL\n");
-      }
-    }
-    else
-    {
-      Serial.printf("NOT NULL\n");
-      stbi_image_free(image);
-    }
-
-    sleep(60);
   }
 
   // doRequest(
@@ -190,6 +169,7 @@ void loop()
   //     display.width());
 
   partialRefresh();
+  sleep(60);
   // delay(responseMetadata.durationMinutes * 60 * 1000);
 }
 
