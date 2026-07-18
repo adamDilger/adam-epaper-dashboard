@@ -4,22 +4,45 @@
 
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
+#include <time.h>
 #include <WiFi.h>
-#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 
 #include "graphics/GxEPD2_display_selection_new_style.h"
 #include "wifi_creds.h"
 
-// const char url[] = "https://adam-epaper-dashboard-cloudflare-api.adamdilger.workers.dev";
-const char url[] = "http://aad.dlgr.au";
+static const char cloudflareRootCa[] PROGMEM = R"EOF(
+-----BEGIN CERTIFICATE-----
+MIIDejCCAmKgAwIBAgIQf+UwvzMTQ77dghYQST2KGzANBgkqhkiG9w0BAQsFADBX
+MQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEQMA4GA1UE
+CxMHUm9vdCBDQTEbMBkGA1UEAxMSR2xvYmFsU2lnbiBSb290IENBMB4XDTIzMTEx
+NTAzNDMyMVoXDTI4MDEyODAwMDA0MlowRzELMAkGA1UEBhMCVVMxIjAgBgNVBAoT
+GUdvb2dsZSBUcnVzdCBTZXJ2aWNlcyBMTEMxFDASBgNVBAMTC0dUUyBSb290IFI0
+MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE83Rzp2iLYK5DuDXFgTB7S0md+8Fhzube
+Rr1r1WEYNa5A3XP3iZEwWus87oV8okB2O6nGuEfYKueSkWpz6bFyOZ8pn6KY019e
+WIZlD6GEZQbR3IvJx3PIjGov5cSr0R2Ko4H/MIH8MA4GA1UdDwEB/wQEAwIBhjAd
+BgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDwYDVR0TAQH/BAUwAwEB/zAd
+BgNVHQ4EFgQUgEzW63T/STaj1dj8tT7FavCUHYwwHwYDVR0jBBgwFoAUYHtmGkUN
+l8qJUC99BM00qP/8/UswNgYIKwYBBQUHAQEEKjAoMCYGCCsGAQUFBzAChhpodHRw
+Oi8vaS5wa2kuZ29vZy9nc3IxLmNydDAtBgNVHR8EJjAkMCKgIKAehhxodHRwOi8v
+Yy5wa2kuZ29vZy9yL2dzcjEuY3JsMBMGA1UdIAQMMAowCAYGZ4EMAQIBMA0GCSqG
+SIb3DQEBCwUAA4IBAQAYQrsPBtYDh5bjP2OBDwmkoWhIDDkic574y04tfzHpn+cJ
+odI2D4SseesQ6bDrarZ7C30ddLibZatoKiws3UL9xnELz4ct92vID24FfVbiI1hY
++SW6FoVHkNeWIP0GCbaM4C6uVdF5dTUsMVs/ZbzNnIdCp5Gxmx5ejvEau8otR/Cs
+kGN+hr/W5GvT1tMBjgWKZ1i4//emhA1JG1BbPzoLJQvyEotc03lXjTaCzv8mEbep
+8RqZ7a2CPsgRbuvTPBwcOMBBmuFeU88+FSBX6+7iP0il8b4Z0QFqIwwMHfs/L6K1
+vepuoxtGzi4CZ68zJpiq1UvSqTbFJjtbD4seiMHl
+-----END CERTIFICATE-----
+)EOF";
 
 #include <HTTPClient.h>
 
-WiFiClient client;
+WiFiClientSecure client;
 HTTPClient https;
 
 void connectToWifi();
 void screenMessage(const char *text);
+bool syncClock();
 
 void testFunction()
 {
@@ -82,6 +105,8 @@ void setup()
   display.init(115200, true, 2, false); // USE THIS for Waveshare boards with "clever" reset circuit, 2ms reset pulse
   // testFunction();
   connectToWifi();
+  syncClock();
+  client.setCACert(cloudflareRootCa);
 }
 
 int refreshCount = 0;
@@ -101,7 +126,7 @@ void loop()
 
   int totalBytesRead = 0;
 
-  if (https.begin(client, url))
+  if (https.begin(client, workerUrl))
   {
     https.addHeader("Accept", "application/octet-stream");
 
@@ -109,6 +134,12 @@ void loop()
     if (httpCode == 200)
     {
       int contentLength = https.getSize();
+      if (contentLength <= 0)
+      {
+        Serial.printf("HTTP GET returned invalid content length: %d\n", contentLength);
+        https.end();
+        return;
+      }
 
       Serial.printf("HTTP GET %d: %d bytes\n", httpCode, contentLength);
 
@@ -122,7 +153,15 @@ void loop()
           break;
         }
 
-        int bytesRead = https.getStream().readBytes(responseBuffer, contentLength);
+        int bytesRead = https.getStream().readBytes(responseBuffer + totalBytesRead, contentLength - totalBytesRead);
+        if (bytesRead <= 0)
+        {
+          Serial.println("HTTP stream ended before all content was read.");
+          delete[] responseBuffer;
+          https.end();
+          return;
+        }
+
         Serial.printf("%d total bytes read so far, %d bytes read this iteration\n", totalBytesRead, bytesRead);
         totalBytesRead += bytesRead;
       }
@@ -156,21 +195,10 @@ void loop()
     }
   }
 
-  // doRequest(
-  //     &responseMetadata,
-  //     [](int x, int y, uint8_t count)
-  //     {
-  //       if (count == 1)
-  //         display.drawPixel(x, y, GxEPD_BLACK);
-  //       else
-  //         display.drawLine(x, y, x + count - 1, y, GxEPD_BLACK);
-  //     },
-  //     client,
-  //     display.width());
-
   partialRefresh();
-  sleep(60);
-  // delay(responseMetadata.durationMinutes * 60 * 1000);
+
+  int tenMinutes = 10 * 60 * 1000;
+  delay(tenMinutes);
 }
 
 void connectToWifi()
@@ -204,6 +232,28 @@ void connectToWifi()
   }
 
   screenMessage("Connected to wifi.");
+}
+
+bool syncClock()
+{
+  configTime(0, 0, "time.cloudflare.com", "pool.ntp.org");
+
+  time_t now = time(nullptr);
+  int attempts = 0;
+  while (now < 1700000000 && attempts < 15)
+  {
+    delay(500);
+    now = time(nullptr);
+    attempts++;
+  }
+
+  if (now < 1700000000)
+  {
+    screenMessage("Clock sync failed.");
+    return false;
+  }
+
+  return true;
 }
 
 void screenMessage(const char *text)
